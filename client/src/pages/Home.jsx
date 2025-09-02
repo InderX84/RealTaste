@@ -30,8 +30,11 @@ const Home = () => {
           <h1 className="text-6xl md:text-8xl font-serif font-bold mb-8 text-yellow-100 drop-shadow-2xl">
             Real Taste Café
           </h1>
-          <p className="text-xl md:text-2xl mb-12 font-light max-w-3xl mx-auto leading-relaxed text-amber-100">
-            A cozy corner where <span className="font-semibold text-yellow-300">stories brew</span> and <span className="font-semibold text-yellow-300">friendships blend</span>
+          <p className="text-xl md:text-2xl mb-6 font-light max-w-3xl mx-auto leading-relaxed text-amber-100">
+            Your favorite <span className="font-semibold text-yellow-300">takeaway destination</span> for fresh food and <span className="font-semibold text-yellow-300">hot beverages</span>
+          </p>
+          <p className="text-lg text-yellow-300 italic font-serif mb-12">
+            "Order karo, ready karo, le jao" - Order it, we'll prepare it, take it away
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link 
@@ -54,19 +57,22 @@ const Home = () => {
       <section className="section-spacing bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50">
         <div className="container mx-auto px-6 sm:px-8 lg:px-12">
           <div className="text-center mb-16">
-            <span className="text-amber-700 font-semibold text-base tracking-wide uppercase font-serif">✨ What Makes Us Special</span>
-            <h2 className="text-5xl font-serif font-bold text-amber-900 mb-6 mt-4">The Café Experience</h2>
-            <p className="text-xl text-amber-800 max-w-2xl mx-auto leading-relaxed">
-              Every cup tells a story, every bite creates a memory
+            <span className="text-amber-700 font-semibold text-base tracking-wide uppercase font-serif">✨ Why Choose Us</span>
+            <h2 className="text-5xl font-serif font-bold text-amber-900 mb-6 mt-4">Quick & Fresh Takeaway</h2>
+            <p className="text-xl text-amber-800 max-w-2xl mx-auto leading-relaxed mb-4">
+              Order online, pick up fresh - it's that simple!
+            </p>
+            <p className="text-lg text-amber-700 italic font-serif">
+              "Ghar jaisi quality, shop jaisi speed" - Home-like quality, shop-like speed
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { icon: Coffee, title: "Freshly Roasted", desc: "Beans roasted daily in small batches for perfect flavor", emoji: "☕" },
-              { icon: Award, title: "Cozy Atmosphere", desc: "Warm, welcoming space perfect for work or relaxation", emoji: "🏠" },
-              { icon: Clock, title: "All Day Comfort", desc: "From morning coffee to evening treats", emoji: "🌅" },
-              { icon: Users, title: "Community Hub", desc: "Where neighbors become friends over great coffee", emoji: "👥" }
+              { icon: Coffee, title: "Fresh & Hot", desc: "Everything prepared fresh when you order", emoji: "🔥" },
+              { icon: Clock, title: "Quick Pickup", desc: "Order ready in 10-15 minutes", emoji: "⚡" },
+              { icon: Award, title: "Quality Food", desc: "Made with love and finest ingredients", emoji: "⭐" },
+              { icon: Users, title: "Easy Ordering", desc: "Order online, pay at shop, take away", emoji: "📱" }
             ].map((feature, index) => (
               <div key={index} className="group text-center p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-amber-200">
                 <div className="text-4xl mb-4">{feature.emoji}</div>
@@ -92,7 +98,7 @@ const Home = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {featuredProducts && featuredProducts.length > 0 ? (
                 featuredProducts.map(product => (
                   <ProductCard key={product._id} product={product} />
@@ -123,8 +129,11 @@ const Home = () => {
         <div className="absolute inset-0" style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%23ffffff" fill-opacity="0.1"%3E%3Cpath d="M20 20c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zm10 0c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10z"/%3E%3C/g%3E%3C/svg%3E")'}}></div>
         <div className="relative max-w-4xl mx-auto text-center px-6 sm:px-8 lg:px-12">
           <h2 className="text-5xl font-serif font-bold text-yellow-100 mb-6">Visit Us Today</h2>
-          <p className="text-xl text-amber-200 mb-10 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-amber-200 mb-6 max-w-3xl mx-auto leading-relaxed">
             Step into our warm, inviting space where every visit feels like coming home
+          </p>
+          <p className="text-lg text-yellow-300 italic font-serif mb-10">
+            "Aao ji, burger khao, coffee piyo, khush raho" - Come friends, eat burgers, drink coffee, be happy
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 

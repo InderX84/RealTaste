@@ -36,7 +36,7 @@ const AdminDashboard = () => {
     { title: 'Total Products', value: products.length, icon: Package, color: 'bg-amber-500' },
     { title: 'Total Users', value: users.length, icon: Users, color: 'bg-green-500' },
     { title: 'Total Orders', value: allOrders.length, icon: ShoppingCart, color: 'bg-blue-500' },
-    { title: 'Revenue', value: `$${totalRevenue.toFixed(2)}`, icon: DollarSign, color: 'bg-purple-500' },
+    { title: 'Revenue', value: `₹${totalRevenue.toFixed(2)}`, icon: DollarSign, color: 'bg-purple-500' },
   ];
 
   return (

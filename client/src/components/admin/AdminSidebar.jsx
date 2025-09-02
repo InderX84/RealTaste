@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Package, ShoppingCart, Users, Tag, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Users, Tag, Settings, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 
 const AdminSidebar = () => {
@@ -12,6 +12,7 @@ const AdminSidebar = () => {
     { path: '/admin/orders', icon: ShoppingCart, label: 'Orders' },
     { path: '/admin/categories', icon: Tag, label: 'Categories' },
     { path: '/admin/users', icon: Users, label: 'Users' },
+    { path: '/admin/settings', icon: Settings, label: 'Settings' },
   ];
 
   const handleLinkClick = () => {

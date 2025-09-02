@@ -60,7 +60,7 @@ const Cart = () => {
                 
                 <div className="flex-1">
                   <h3 className="text-xl font-serif font-bold text-amber-900">{item.name}</h3>
-                  <p className="text-amber-700 font-semibold text-lg">${item.price}</p>
+                  <p className="text-amber-700 font-semibold text-lg">₹{item.price}</p>
                 </div>
                 
                 <div className="flex items-center space-x-3 bg-amber-50 rounded-full p-2">
@@ -82,7 +82,7 @@ const Cart = () => {
                 </div>
                 
                 <div className="text-xl font-bold text-amber-900">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  ₹{(item.price * item.quantity).toFixed(2)}
                 </div>
                 
                 <button
@@ -98,7 +98,7 @@ const Cart = () => {
           <div className="bg-amber-50 card-spacing">
             <div className="flex justify-between items-center mb-6">
               <span className="text-2xl font-serif font-bold text-amber-900">💰 Total:</span>
-              <span className="text-3xl font-bold text-amber-700">${total.toFixed(2)}</span>
+              <span className="text-3xl font-bold text-amber-700">₹{total.toFixed(2)}</span>
             </div>
             
             <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">

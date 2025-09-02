@@ -20,6 +20,7 @@ export interface IOrder extends Document {
   status: 'Pending' | 'Preparing' | 'Ready' | 'Delivered' | 'Cancelled';
   paymentStatus: 'Pending' | 'Completed' | 'Failed';
   paymentMethod: 'Cash' | 'Card';
+  mobileNumber?: string;
   specialInstructions?: string;
   isPaid?: boolean;
   paidAt?: Date;
@@ -70,6 +71,10 @@ const orderSchema = new Schema<IOrder>({
     type: String,
     enum: ['Cash', 'Card'],
     required: true
+  },
+  mobileNumber: {
+    type: String,
+    match: [/^[6-9]\d{9}$/, 'Please enter a valid mobile number']
   },
   specialInstructions: {
     type: String,

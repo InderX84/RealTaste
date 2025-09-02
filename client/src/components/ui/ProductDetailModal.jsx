@@ -51,7 +51,7 @@ const ProductDetailModal = ({ product, onClose }) => {
                 {averageRating.toFixed(1)} ({product.numOfReviews} reviews)
               </span>
             </div>
-            <div className="text-3xl font-bold text-amber-700 font-serif">${product.price}</div>
+            <div className="text-3xl font-bold text-amber-700 font-serif">₹{product.price}</div>
           </div>
           
           <p className="text-amber-800 mb-6 leading-relaxed font-serif text-lg">{product.description}</p>

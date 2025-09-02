@@ -17,23 +17,32 @@ export const addReview = async (req: AuthRequest, res: Response) => {
     }
 
     // Check if user already reviewed this product
-    const existingReview = product.reviews?.find(
+    const existingReviewIndex = product.reviews?.findIndex(
       (review: any) => review.user.toString() === userId
     );
 
-    if (existingReview) {
-      return res.status(400).json({ message: 'You have already reviewed this product' });
+    if (existingReviewIndex !== -1) {
+      // Update existing review
+      product.reviews[existingReviewIndex] = {
+        ...product.reviews[existingReviewIndex],
+        rating: Number(rating),
+        comment,
+        createdAt: product.reviews[existingReviewIndex].createdAt, // Keep original date
+        updatedAt: new Date()
+      };
+    } else {
+      // Add new review
+      const review = {
+        user: userId,
+        rating: Number(rating),
+        comment,
+        createdAt: new Date()
+      };
+      product.reviews = product.reviews || [];
+      product.reviews.push(review);
     }
 
-    const review = {
-      user: userId,
-      rating: Number(rating),
-      comment,
-      createdAt: new Date()
-    };
 
-    product.reviews = product.reviews || [];
-    product.reviews.push(review);
     await product.save();
 
     // Populate user data for response

@@ -42,8 +42,11 @@ const Menu = () => {
           <div className="mb-6">
             <Coffee className="h-16 w-16 text-yellow-300 mx-auto mb-4" />
           </div>
-          <h1 className="text-5xl font-serif font-bold mb-6 text-yellow-100">Café Menu</h1>
-          <p className="text-xl text-amber-200 max-w-2xl mx-auto">Handcrafted beverages and homemade treats made with love ☕🍰</p>
+          <h1 className="text-5xl font-serif font-bold mb-6 text-yellow-100">Takeaway Menu</h1>
+          <p className="text-xl text-amber-200 max-w-2xl mx-auto mb-4">Fresh food & beverages ready for pickup 🛒☕</p>
+          <p className="text-lg text-yellow-300 italic font-serif">
+            "Order karo online, fresh banake denge" - Order online, we'll make it fresh for you
+          </p>
         </div>
       </div>
 
@@ -54,7 +57,7 @@ const Menu = () => {
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-amber-600 h-5 w-5" />
             <input
               type="text"
-              placeholder="What can we brew for you? ☕"
+              placeholder="What would you like to order? 🍽️"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-12 pr-4 py-4 border-2 border-amber-200 rounded-full focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-400 shadow-md text-lg bg-white/80 backdrop-blur-sm font-serif"
@@ -102,7 +105,7 @@ const Menu = () => {
             <p className="text-amber-700 text-lg">Try a different search or explore all our offerings</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
             {filteredProducts.map(product => (
               <ProductCard key={product._id} product={product} />
             ))}

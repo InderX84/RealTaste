@@ -42,6 +42,9 @@ import cartRoutes from './routes/cart.routes';
 import orderRoutes from './routes/order.routes';
 import categoryRoutes from './routes/category.routes';
 import contactRoutes from './routes/contact.routes';
+import otpRoutes from './routes/otp.routes';
+import settingRoutes from './routes/setting.routes';
+import bulkRoutes from './routes/bulk.routes';
 import adminSettingsRoutes from './routes/admin-settings.routes';
 
 // Mount all API routes
@@ -51,6 +54,9 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/otp', otpRoutes);
+app.use('/api/settings', settingRoutes);
+app.use('/api/bulk', bulkRoutes);
 app.use('/api/admin/settings', adminSettingsRoutes);
 
 // Error handling middleware

@@ -35,9 +35,9 @@ const Header = () => {
 
           <nav className="hidden md:flex items-center justify-center flex-1 space-x-2">
             <Link to="/" className="px-6 py-3 text-amber-800 hover:text-amber-900 font-semibold transition-all duration-300 rounded-full hover:bg-amber-100 font-serif text-sm">🏠 Home</Link>
-            <Link to="/menu" className="px-6 py-3 text-amber-800 hover:text-amber-900 font-semibold transition-all duration-300 rounded-full hover:bg-amber-100 font-serif text-sm">☕ Menu</Link>
+            <Link to="/menu" className="px-6 py-3 text-amber-800 hover:text-amber-900 font-semibold transition-all duration-300 rounded-full hover:bg-amber-100 font-serif text-sm">🍽️ Order</Link>
             <Link to="/about" className="px-6 py-3 text-amber-800 hover:text-amber-900 font-semibold transition-all duration-300 rounded-full hover:bg-amber-100 font-serif text-sm">📖 About</Link>
-            <Link to="/contact" className="px-6 py-3 text-amber-800 hover:text-amber-900 font-semibold transition-all duration-300 rounded-full hover:bg-amber-100 font-serif text-sm">📞 Contact</Link>
+            <Link to="/contact" className="px-6 py-3 text-amber-800 hover:text-amber-900 font-semibold transition-all duration-300 rounded-full hover:bg-amber-100 font-serif text-sm">📍 Location</Link>
           </nav>
 
           <div className="flex items-center space-x-2 sm:space-x-3">
@@ -93,9 +93,9 @@ const Header = () => {
           <div className="md:hidden py-4 border-t border-amber-200">
             <nav className="flex flex-col space-y-2">
               <Link to="/" className="text-amber-800 hover:text-amber-900 py-3 px-4 rounded-lg hover:bg-amber-100 transition-all font-serif" onClick={() => setIsMobileMenuOpen(false)}>🏠 Home</Link>
-              <Link to="/menu" className="text-amber-800 hover:text-amber-900 py-3 px-4 rounded-lg hover:bg-amber-100 transition-all font-serif" onClick={() => setIsMobileMenuOpen(false)}>☕ Menu</Link>
+              <Link to="/menu" className="text-amber-800 hover:text-amber-900 py-3 px-4 rounded-lg hover:bg-amber-100 transition-all font-serif" onClick={() => setIsMobileMenuOpen(false)}>🍽️ Order</Link>
               <Link to="/about" className="text-amber-800 hover:text-amber-900 py-3 px-4 rounded-lg hover:bg-amber-100 transition-all font-serif" onClick={() => setIsMobileMenuOpen(false)}>📖 About</Link>
-              <Link to="/contact" className="text-amber-800 hover:text-amber-900 py-3 px-4 rounded-lg hover:bg-amber-100 transition-all font-serif" onClick={() => setIsMobileMenuOpen(false)}>📞 Contact</Link>
+              <Link to="/contact" className="text-amber-800 hover:text-amber-900 py-3 px-4 rounded-lg hover:bg-amber-100 transition-all font-serif" onClick={() => setIsMobileMenuOpen(false)}>📍 Location</Link>
               {isAuthenticated && user && (
                 <div className="pt-2 border-t border-amber-200 mt-2 space-y-2">
                   <Link to="/profile" className="block text-amber-800 hover:text-amber-900 py-3 px-4 rounded-lg hover:bg-amber-100 transition-all font-serif" onClick={() => setIsMobileMenuOpen(false)}>👤 Profile</Link>

@@ -105,7 +105,7 @@ const ProductForm = ({ product, onClose }) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-amber-800 mb-3">Price ($)</label>
+              <label className="block text-sm font-semibold text-amber-800 mb-3">Price (₹)</label>
               <input
                 {...register('price', { 
                   required: 'Price is required', 

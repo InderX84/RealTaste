@@ -11,13 +11,10 @@ class OrderController extends BaseController {
   // Create new order
   create = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { items, shippingAddress, paymentMethod } = req.body;
-
-      // Calculate prices
-      let itemsPrice = 0;
-      let totalPrice = 0;
+      const { items, paymentMethod, mobileNumber, specialInstructions, totalAmount } = req.body;
 
       // Verify products and calculate total
+      let calculatedTotal = 0;
       for (const item of items) {
         const product = await Product.findById(item.product);
         if (!product) {
@@ -36,21 +33,17 @@ class OrderController extends BaseController {
           return;
         }
 
-        itemsPrice += product.price * item.quantity;
+        calculatedTotal += product.price * item.quantity;
       }
 
-      // Calculate tax and shipping
-      const taxPrice = itemsPrice * 0.15; // 15% tax
-      const shippingPrice = itemsPrice > 100 ? 0 : 10; // Free shipping over $100
-      totalPrice = itemsPrice + taxPrice + shippingPrice;
-
-      // Create order
+      // Create order (takeaway - no shipping address needed)
       const order = await Order.create({
         user: req.user?.id,
         items,
-        shippingAddress,
         paymentMethod,
-        totalAmount: totalPrice
+        mobileNumber,
+        specialInstructions,
+        totalAmount: totalAmount || calculatedTotal
       });
 
       // Update product stock
@@ -72,13 +65,14 @@ class OrderController extends BaseController {
             html: `
               <h2>Order Confirmation</h2>
               <p>Hi ${user.name},</p>
-              <p>Thank you for your order! Your order #${String(order._id).slice(-6)} has been received.</p>
-              <p><strong>Total Amount:</strong> $${totalPrice.toFixed(2)}</p>
+              <p>Thank you for your takeaway order! Your order #${String(order._id).slice(-6)} has been received.</p>
+              <p><strong>Total Amount:</strong> ₹${order.totalAmount.toFixed(2)}</p>
               <p><strong>Status:</strong> ${order.status}</p>
-              <p>We'll notify you when your order status changes.</p>
+              <p><strong>Pickup Location:</strong> UpalHeri, Rajpura, Punjab 140401</p>
+              <p>We'll call you on ${mobileNumber} when your order is ready for pickup.</p>
               <p>Best regards,<br>Real Taste Team</p>
             `,
-            message: `Order #${String(order._id).slice(-6)} confirmed. Total: $${totalPrice.toFixed(2)}`
+            message: `Order #${String(order._id).slice(-6)} confirmed. Total: ₹${order.totalAmount.toFixed(2)}`
           });
         }
       } catch (emailError) {
@@ -99,6 +93,25 @@ class OrderController extends BaseController {
     try {
       const orders = await Order.find({ user: req.user?.id })
         .populate('items.product')
+        .populate('user', 'name email')
+        .sort('-createdAt');
+
+      res.status(200).json({
+        success: true,
+        count: orders.length,
+        data: orders
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // Get all orders (admin)
+  getAll = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const orders = await Order.find()
+        .populate('items.product')
+        .populate('user', 'name email')
         .sort('-createdAt');
 
       res.status(200).json({

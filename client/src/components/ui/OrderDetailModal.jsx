@@ -29,7 +29,7 @@ const OrderDetailModal = ({ order, onClose }) => {
                 <DollarSign className="h-5 w-5 text-amber-600" />
                 <span className="font-serif font-semibold text-amber-800">Total Amount</span>
               </div>
-              <p className="text-2xl font-bold text-amber-900 font-serif">${order.totalAmount}</p>
+              <p className="text-2xl font-bold text-amber-900 font-serif">₹{order.totalAmount}</p>
             </div>
           </div>
 
@@ -72,7 +72,7 @@ const OrderDetailModal = ({ order, onClose }) => {
                     <p className="font-serif font-semibold text-amber-900">{item.product?.name || 'Unknown Item'}</p>
                     <p className="text-amber-700 font-serif">Quantity: {item.quantity}</p>
                   </div>
-                  <p className="font-bold text-amber-900 font-serif">${(item.price * item.quantity).toFixed(2)}</p>
+                  <p className="font-bold text-amber-900 font-serif">₹{(item.price * item.quantity).toFixed(2)}</p>
                 </div>
               ))}
             </div>

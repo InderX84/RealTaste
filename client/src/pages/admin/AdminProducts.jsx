@@ -5,6 +5,8 @@ import { fetchAllProducts, deleteProduct } from '../../store/slices/adminSlice';
 import { useToast } from '../../contexts/ToastContext';
 import ProductForm from '../../components/admin/ProductForm';
 import ProductDetailModal from '../../components/ui/ProductDetailModal';
+import BulkImport from '../../components/admin/BulkImport';
+import LoadingOverlay from '../../components/ui/LoadingOverlay';
 import AdminLayout from '../../components/admin/AdminLayout';
 
 const AdminProducts = () => {
@@ -14,6 +16,8 @@ const AdminProducts = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [viewingProduct, setViewingProduct] = useState(null);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [showBulkImport, setShowBulkImport] = useState(false);
 
   useEffect(() => {
     dispatch(fetchAllProducts());
@@ -21,11 +25,14 @@ const AdminProducts = () => {
 
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
+      setActionLoading(true);
       try {
         await dispatch(deleteProduct(id));
         toast.success('Product deleted successfully! 🗑️');
       } catch (err) {
         toast.error('Failed to delete product');
+      } finally {
+        setActionLoading(false);
       }
     }
   };
@@ -53,15 +60,35 @@ const AdminProducts = () => {
               <h1 className="text-3xl font-bold text-gray-900">Products Management</h1>
               <p className="text-gray-600 mt-1">Manage your menu items and inventory</p>
             </div>
-            <button
-              onClick={() => setShowModal(true)}
-              className="bg-amber-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-amber-700 transition-colors flex items-center justify-center space-x-2 shadow-lg"
-            >
-              <Plus className="h-5 w-5" />
-              <span>Add New Product</span>
-            </button>
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+              <button
+                onClick={() => setShowBulkImport(!showBulkImport)}
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2 shadow-lg"
+              >
+                <span>{showBulkImport ? 'Hide' : 'Show'} Bulk Import</span>
+              </button>
+              <button
+                onClick={() => setShowModal(true)}
+                className="bg-amber-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-amber-700 transition-colors flex items-center justify-center space-x-2 shadow-lg"
+              >
+                <Plus className="h-5 w-5" />
+                <span>Add New Product</span>
+              </button>
+            </div>
           </div>
         </div>
+
+        {showBulkImport && (
+          <div className="mb-8">
+            <BulkImport 
+              type="products" 
+              onSuccess={() => {
+                dispatch(fetchAllProducts());
+                setShowBulkImport(false);
+              }} 
+            />
+          </div>
+        )}
 
         {loading ? (
           <div className="flex justify-center py-12">
@@ -101,7 +128,7 @@ const AdminProducts = () => {
                         </div>
                       </td>
                       <td className="table-cell-spacing whitespace-nowrap text-sm text-amber-800 font-serif">{product.category}</td>
-                      <td className="table-cell-spacing whitespace-nowrap text-sm text-amber-800 font-serif font-bold">${product.price}</td>
+                      <td className="table-cell-spacing whitespace-nowrap text-sm text-amber-800 font-serif font-bold">₹{product.price}</td>
                       <td className="table-cell-spacing whitespace-nowrap text-sm text-amber-800 font-serif">{product.stock}</td>
                       <td className="table-cell-spacing whitespace-nowrap">
                         <span className={`px-3 py-1 text-xs font-semibold rounded-full font-serif ${
@@ -169,6 +196,8 @@ const AdminProducts = () => {
             onClose={() => setViewingProduct(null)} 
           />
         )}
+        
+        {actionLoading && <LoadingOverlay message="Processing product action..." />}
       </div>
     </AdminLayout>
   );

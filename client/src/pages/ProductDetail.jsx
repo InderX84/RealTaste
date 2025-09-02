@@ -18,6 +18,7 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewData, setReviewData] = useState({ rating: 5, comment: '' });
+  const [editingReview, setEditingReview] = useState(false);
 
   useEffect(() => {
     fetchProduct();
@@ -58,9 +59,10 @@ const ProductDetail = () => {
     
     try {
       await api.post(`/api/products/${id}/reviews`, reviewData);
-      toast.success('Review submitted successfully! ⭐');
+      toast.success(editingReview ? 'Review updated successfully! ⭐' : 'Review submitted successfully! ⭐');
       setReviewData({ rating: 5, comment: '' });
       setShowReviewForm(false);
+      setEditingReview(false);
       fetchReviews();
     } catch (error) {
       toast.error('Failed to submit review');
@@ -116,7 +118,7 @@ const ProductDetail = () => {
                 <span className="ml-2 text-amber-700 font-serif">({reviews.length} reviews)</span>
               </div>
               <p className="text-amber-800 font-serif text-lg mb-6">{product.description}</p>
-              <div className="text-3xl font-bold text-amber-900 mb-6">${product.price}</div>
+              <div className="text-3xl font-bold text-amber-900 mb-6">₹{product.price}</div>
               
               <div className="flex items-center space-x-4 mb-6">
                 <div className="flex items-center border-2 border-amber-200 rounded-lg">
@@ -152,10 +154,20 @@ const ProductDetail = () => {
             <h2 className="text-2xl font-serif font-bold text-amber-900">Reviews</h2>
             {isAuthenticated && (
               <button
-                onClick={() => setShowReviewForm(!showReviewForm)}
+                onClick={() => {
+                  const userReview = reviews.find(r => r.user?._id === user?.id);
+                  if (userReview) {
+                    setReviewData({ rating: userReview.rating, comment: userReview.comment });
+                    setEditingReview(true);
+                  } else {
+                    setReviewData({ rating: 5, comment: '' });
+                    setEditingReview(false);
+                  }
+                  setShowReviewForm(!showReviewForm);
+                }}
                 className="bg-amber-700 text-yellow-100 px-4 py-2 rounded-lg font-serif hover:bg-amber-800"
               >
-                Write Review
+                {reviews.find(r => r.user?._id === user?.id) ? 'Edit Review' : 'Write Review'}
               </button>
             )}
           </div>
@@ -163,6 +175,9 @@ const ProductDetail = () => {
           {/* Review Form */}
           {showReviewForm && (
             <form onSubmit={handleReviewSubmit} className="mb-8 p-6 bg-amber-50 rounded-2xl border border-amber-200">
+              <h3 className="text-lg font-serif font-bold text-amber-900 mb-4">
+                {editingReview ? 'Edit Your Review' : 'Write a Review'}
+              </h3>
               <div className="mb-4">
                 <label className="block text-amber-800 font-serif font-semibold mb-2">Rating</label>
                 <div className="flex space-x-1">
@@ -196,7 +211,7 @@ const ProductDetail = () => {
                   type="submit"
                   className="bg-amber-700 text-yellow-100 px-6 py-2 rounded-lg font-serif hover:bg-amber-800"
                 >
-                  Submit Review
+                  {editingReview ? 'Update Review' : 'Submit Review'}
                 </button>
                 <button
                   type="button"

@@ -4,6 +4,7 @@ import { ShoppingCart, Calendar, DollarSign, Eye, Edit } from 'lucide-react';
 import { fetchAllOrders, updateOrderStatus } from '../../store/slices/orderSlice';
 import { useToast } from '../../contexts/ToastContext';
 import OrderDetailModal from '../../components/ui/OrderDetailModal';
+import LoadingOverlay from '../../components/ui/LoadingOverlay';
 import AdminLayout from '../../components/admin/AdminLayout';
 
 const AdminOrders = () => {
@@ -11,6 +12,8 @@ const AdminOrders = () => {
   const { allOrders: orders = [], loading } = useSelector(state => state.orders);
   const [editingOrder, setEditingOrder] = useState(null);
   const [viewingOrder, setViewingOrder] = useState(null);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
   const toast = useToast();
 
   useEffect(() => {
@@ -18,12 +21,27 @@ const AdminOrders = () => {
   }, [dispatch]);
 
   const handleStatusUpdate = async (orderId, newStatus) => {
+    setActionLoading(true);
     try {
       await dispatch(updateOrderStatus({ id: orderId, status: newStatus }));
       toast.success('Order status updated successfully! ✅');
       setEditingOrder(null);
+      setConfirmAction(null);
     } catch (error) {
       toast.error('Failed to update order status');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleAcceptReject = (order, action) => {
+    setConfirmAction({ order, action });
+  };
+
+  const confirmStatusUpdate = () => {
+    if (confirmAction) {
+      const newStatus = confirmAction.action === 'accept' ? 'Preparing' : 'Cancelled';
+      handleStatusUpdate(confirmAction.order._id, newStatus);
     }
   };
 
@@ -77,7 +95,7 @@ const AdminOrders = () => {
                         {new Date(order.createdAt).toLocaleDateString()}
                       </td>
                       <td className="table-cell-spacing whitespace-nowrap text-sm text-amber-800 font-serif font-bold">
-                        ${order.totalAmount}
+                        ₹{order.totalAmount}
                       </td>
                       <td className="table-cell-spacing whitespace-nowrap">
                         <span className={`px-3 py-1 text-xs font-semibold rounded-full font-serif ${
@@ -89,19 +107,36 @@ const AdminOrders = () => {
                         </span>
                       </td>
                       <td className="table-cell-spacing whitespace-nowrap text-sm font-medium">
-                        <div className="flex space-x-3">
+                        <div className="flex space-x-2">
                           <button 
                             onClick={() => handleView(order)}
                             className="text-blue-600 hover:text-blue-800 p-2 rounded-full hover:bg-blue-50 transition-all"
                           >
                             <Eye className="h-5 w-5" />
                           </button>
-                          <button 
-                            onClick={() => setEditingOrder(order)}
-                            className="text-amber-600 hover:text-amber-800 p-2 rounded-full hover:bg-amber-50 transition-all"
-                          >
-                            <Edit className="h-5 w-5" />
-                          </button>
+                          {order.status === 'Pending' ? (
+                            <>
+                              <button 
+                                onClick={() => handleAcceptReject(order, 'accept')}
+                                className="bg-green-600 text-white px-3 py-1 rounded-full text-xs hover:bg-green-700 transition-all"
+                              >
+                                Accept
+                              </button>
+                              <button 
+                                onClick={() => handleAcceptReject(order, 'reject')}
+                                className="bg-red-600 text-white px-3 py-1 rounded-full text-xs hover:bg-red-700 transition-all"
+                              >
+                                Reject
+                              </button>
+                            </>
+                          ) : (
+                            <button 
+                              onClick={() => setEditingOrder(order)}
+                              className="text-amber-600 hover:text-amber-800 p-2 rounded-full hover:bg-amber-50 transition-all"
+                            >
+                              <Edit className="h-5 w-5" />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -126,8 +161,69 @@ const AdminOrders = () => {
             onClose={() => setViewingOrder(null)}
           />
         )}
+
+        {confirmAction && (
+          <ConfirmActionModal 
+            order={confirmAction.order}
+            action={confirmAction.action}
+            onConfirm={confirmStatusUpdate}
+            onClose={() => setConfirmAction(null)}
+          />
+        )}
+        
+        {actionLoading && <LoadingOverlay message="Updating order status..." />}
       </div>
     </AdminLayout>
+  );
+};
+
+const ConfirmActionModal = ({ order, action, onConfirm, onClose }) => {
+  const isAccept = action === 'accept';
+  
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white/90 backdrop-blur-sm rounded-3xl card-spacing w-full max-w-md border-2 border-amber-200">
+        <div className="text-center mb-6">
+          <div className={`text-4xl mb-4 ${isAccept ? 'text-green-600' : 'text-red-600'}`}>
+            {isAccept ? '✅' : '❌'}
+          </div>
+          <h3 className="text-xl font-semibold mb-2">
+            {isAccept ? 'Accept Order' : 'Reject Order'}
+          </h3>
+          <p className="text-gray-600">Order #{order._id.slice(-6)}</p>
+          <p className="text-sm text-gray-500 mt-2">
+            Customer: {order.user?.name || 'Unknown'}
+          </p>
+        </div>
+        
+        <div className="bg-amber-50 p-4 rounded-lg mb-6">
+          <p className="text-sm text-amber-800">
+            {isAccept 
+              ? 'This will start preparing the order and notify the customer.' 
+              : 'This will cancel the order and notify the customer.'}
+          </p>
+        </div>
+        
+        <div className="flex space-x-3">
+          <button
+            onClick={onConfirm}
+            className={`flex-1 text-white py-3 px-4 rounded-lg font-semibold ${
+              isAccept 
+                ? 'bg-green-600 hover:bg-green-700' 
+                : 'bg-red-600 hover:bg-red-700'
+            }`}
+          >
+            {isAccept ? 'Accept Order' : 'Reject Order'}
+          </button>
+          <button
+            onClick={onClose}
+            className="flex-1 bg-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-400 font-semibold"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 

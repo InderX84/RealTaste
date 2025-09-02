@@ -44,8 +44,11 @@ const Contact = () => {
           <div className="mb-6">
             <MapPin className="h-16 w-16 text-yellow-300 mx-auto mb-4" />
           </div>
-          <h1 className="text-5xl font-serif font-bold mb-6 text-yellow-100">Visit Our Café</h1>
-          <p className="text-xl text-amber-200 max-w-2xl mx-auto">Come find us in the heart of the neighborhood 📍☕</p>
+          <h1 className="text-5xl font-serif font-bold mb-6 text-yellow-100">Find Our Takeaway Shop</h1>
+          <p className="text-xl text-amber-200 max-w-2xl mx-auto mb-4">Quick pickup location in Rajpura 📍🛒</p>
+          <p className="text-lg text-yellow-300 italic font-serif">
+            "Order karo, aake le jao" - Order it, come and take it away
+          </p>
         </div>
       </section>
 
@@ -67,9 +70,9 @@ const Contact = () => {
                   <div>
                     <h3 className="font-serif font-bold text-amber-900 text-lg mb-2">📍 Address</h3>
                     <p className="text-amber-800 font-serif">
-                      123 Coffee Street<br />
-                      Downtown District<br />
-                      City, State 12345
+                      UpalHeri<br />
+                      Rajpura, Panjab<br />
+                      near Shahdil Hair Saloon, 140401
                     </p>
                   </div>
                 </div>
@@ -80,7 +83,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="font-serif font-bold text-amber-900 text-lg mb-2">📞 Phone</h3>
-                    <p className="text-amber-800 font-serif">(555) 123-CAFE</p>
+                    <p className="text-amber-800 font-serif">+91 9465520816</p>
                     <p className="text-amber-700 text-sm font-serif">Call us for reservations or questions</p>
                   </div>
                 </div>
@@ -101,12 +104,24 @@ const Contact = () => {
                     <Clock className="h-6 w-6 text-yellow-100" />
                   </div>
                   <div>
-                    <h3 className="font-serif font-bold text-amber-900 text-lg mb-2">🕐 Hours</h3>
+                    <h3 className="font-serif font-bold text-amber-900 text-lg mb-2">🕐 Pickup Hours</h3>
                     <div className="text-amber-800 font-serif space-y-1">
-                      <p>Monday - Friday: 6:00 AM - 9:00 PM</p>
-                      <p>Saturday: 7:00 AM - 10:00 PM</p>
-                      <p>Sunday: 7:00 AM - 8:00 PM</p>
+                      <p>Monday - Friday: 10:00 AM - 9:00 PM</p>
+                      <p>Saturday: 10:00 AM - 9:00 PM</p>
+                      <p>Sunday: 10:00 AM - 8:00 PM</p>
+                      <p className="text-amber-600 text-sm mt-2">📞 Call before coming to confirm order</p>
                     </div>
+                  </div>
+                </div>
+                
+                <div className="flex items-start space-x-4">
+                  <div className="bg-amber-700 p-3 rounded-full">
+                    <span className="text-yellow-100 text-xl">📷</span>
+                  </div>
+                  <div>
+                    <h3 className="font-serif font-bold text-amber-900 text-lg mb-2">📷 Instagram</h3>
+                    <a href="https://www.instagram.com/real_taste_in/" target="_blank" rel="noopener noreferrer" className="text-amber-800 font-serif hover:text-amber-600 transition-colors">@real_taste_in</a>
+                    <p className="text-amber-700 text-sm font-serif">Follow us for daily updates and delicious photos!</p>
                   </div>
                 </div>
               </div>
@@ -201,13 +216,17 @@ const Contact = () => {
           </div>
           
           <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-8 border-2 border-amber-200">
-            <div className="bg-amber-100 rounded-2xl h-96 flex items-center justify-center">
-              <div className="text-center">
-                <MapPin className="h-16 w-16 text-amber-600 mx-auto mb-4" />
-                <h3 className="text-2xl font-serif font-bold text-amber-900 mb-2">Interactive Map</h3>
-                <p className="text-amber-700 font-serif">Map integration would go here</p>
-                <p className="text-amber-600 font-serif text-sm mt-2">123 Coffee Street, Downtown District</p>
-              </div>
+            <div className="rounded-2xl overflow-hidden shadow-lg">
+              <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d321.0923276196835!2d76.55902075485523!3d30.519629444334726!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2sin!4v1756791669651!5m2!1sen!2sin" 
+                width="100%" 
+                height="400" 
+                style={{border: 0}} 
+                allowFullScreen="" 
+                loading="lazy" 
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Real Taste Cafe Location"
+              ></iframe>
             </div>
           </div>
         </div>

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { CreditCard, MapPin } from 'lucide-react';
+import { CreditCard, MapPin, Mail, Shield } from 'lucide-react';
 import { clearCart } from '../store/slices/cartSlice';
 import { useToast } from '../contexts/ToastContext';
 import api from '../utils/api';
@@ -15,13 +15,12 @@ const Checkout = () => {
   const { user, isAuthenticated } = useSelector(state => state.auth);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showOTPStep, setShowOTPStep] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [orderData, setOrderData] = useState(null);
 
-  const { register, handleSubmit, formState: { errors } } = useForm({
-    defaultValues: {
-      paymentMethod: 'Card',
-      shippingAddress: ''
-    }
-  });
+  const { register, handleSubmit, formState: { errors } } = useForm();
 
   const onSubmit = async (data) => {
     if (!isAuthenticated || !user) {
@@ -33,19 +32,46 @@ const Checkout = () => {
     setError('');
 
     try {
-      const orderData = {
+      const newOrderData = {
         items: items.map(item => ({
           product: item._id,
           quantity: item.quantity,
           price: item.price
         })),
         totalAmount: parseFloat(total.toFixed(2)),
-        paymentMethod: data.paymentMethod,
-        shippingAddress: data.shippingAddress,
+        paymentMethod: 'Pay at Shop',
+        mobileNumber: data.mobileNumber,
         specialInstructions: data.specialInstructions || ''
       };
 
-      console.log('Order data:', orderData);
+      // Send OTP to user's email
+      await api.post('/api/otp/send', { email: user.email });
+      setOrderData(newOrderData);
+      setShowOTPStep(true);
+      toast.success('OTP sent to your email! 📧');
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || 'Failed to send OTP';
+      setError(errorMsg);
+      toast.error(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOTPVerification = async () => {
+    if (!otp || otp.length !== 6) {
+      setError('Please enter a valid 6-digit OTP');
+      return;
+    }
+
+    setOtpLoading(true);
+    setError('');
+
+    try {
+      // Verify OTP
+      await api.post('/api/otp/verify', { email: user.email, otp });
+      
+      // Place order after OTP verification
       const response = await api.post('/api/orders', orderData);
       
       if (response.data.success) {
@@ -54,11 +80,11 @@ const Checkout = () => {
         navigate('/orders');
       }
     } catch (err) {
-      const errorMsg = err.response?.data?.message || 'Failed to place order';
+      const errorMsg = err.response?.data?.message || 'Invalid OTP';
       setError(errorMsg);
       toast.error(errorMsg);
     } finally {
-      setLoading(false);
+      setOtpLoading(false);
     }
   };
 
@@ -79,16 +105,25 @@ const Checkout = () => {
       <div className="container mx-auto px-6 sm:px-8 lg:px-12">
         <div className="text-center mb-12">
           <div className="text-4xl mb-4">🛒</div>
-          <h1 className="text-4xl font-serif font-bold text-amber-900 mb-2">Checkout</h1>
-          <p className="text-amber-700">Complete your order</p>
+          <h1 className="text-4xl font-serif font-bold text-amber-900 mb-2">Place Order</h1>
+          <p className="text-amber-700">Complete your takeaway order</p>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Order Form */}
           <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl card-spacing border-2 border-amber-200">
             <h2 className="text-2xl font-serif font-bold text-amber-900 mb-8 flex items-center">
-              <span className="mr-3">📝</span> Order Details
+              <span className="mr-3">📝</span> Order Information
             </h2>
+            
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 mb-6">
+              <div className="flex items-center space-x-2">
+                <MapPin className="h-5 w-5 text-blue-600" />
+                <span className="font-medium text-blue-800">Pickup Location:</span>
+              </div>
+              <p className="text-blue-900 font-semibold mt-1">UpalHeri, Rajpura, Punjab 140401</p>
+              <p className="text-blue-700 text-sm mt-1">Near Shahdil Hair Saloon</p>
+            </div>
             
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-6">
@@ -97,47 +132,37 @@ const Checkout = () => {
             )}
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <MapPin className="inline h-4 w-4 mr-1" />
-                  Delivery Address
-                </label>
-                <textarea
-                  {...register('shippingAddress', { required: 'Delivery address is required' })}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  placeholder="Enter your delivery address"
-                />
-                {errors.shippingAddress && (
-                  <p className="text-red-600 text-sm mt-1">{errors.shippingAddress.message}</p>
-                )}
-              </div>
+
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <CreditCard className="inline h-4 w-4 mr-1" />
-                  Payment Method
+                  📱 Mobile Number
                 </label>
-                <div className="space-y-2">
-                  <label className="flex items-center">
-                    <input
-                      {...register('paymentMethod')}
-                      type="radio"
-                      value="Card"
-                      className="text-amber-600 focus:ring-amber-500"
-                    />
-                    <span className="ml-2">Credit/Debit Card</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      {...register('paymentMethod')}
-                      type="radio"
-                      value="Cash"
-                      className="text-amber-600 focus:ring-amber-500"
-                    />
-                    <span className="ml-2">Cash on Delivery</span>
-                  </label>
+                <input
+                  {...register('mobileNumber', { 
+                    required: 'Mobile number is required for order confirmation',
+                    pattern: {
+                      value: /^[6-9]\d{9}$/,
+                      message: 'Please enter a valid 10-digit mobile number'
+                    }
+                  })}
+                  type="tel"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  placeholder="We'll call you when your order is ready"
+                  maxLength={10}
+                />
+                {errors.mobileNumber && (
+                  <p className="text-red-600 text-sm mt-1">{errors.mobileNumber.message}</p>
+                )}
+              </div>
+
+              <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
+                <div className="flex items-center space-x-2">
+                  <CreditCard className="h-5 w-5 text-amber-600" />
+                  <span className="font-medium text-amber-800">Payment Method:</span>
+                  <span className="text-amber-900 font-semibold">Pay at Shop</span>
                 </div>
+                <p className="text-amber-700 text-sm mt-2">Pay when you pick up your order at our shop</p>
               </div>
 
               <div>
@@ -149,17 +174,59 @@ const Checkout = () => {
                   rows={2}
                   maxLength={500}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  placeholder="Any special requests or instructions"
+                  placeholder="Any special requests for your order preparation"
                 />
               </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-amber-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-amber-700 disabled:opacity-50 transition-colors"
-              >
-                {loading ? 'Placing Order...' : `Place Order - $${total.toFixed(2)}`}
-              </button>
+              {!showOTPStep ? (
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-amber-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-amber-700 disabled:opacity-50 transition-colors"
+                >
+                  {loading ? 'Sending OTP...' : `Proceed to Verify - ₹${total.toFixed(2)}`}
+                </button>
+              ) : (
+                <div className="space-y-4">
+                  <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                    <div className="flex items-center mb-2">
+                      <Mail className="h-5 w-5 text-blue-600 mr-2" />
+                      <span className="font-semibold text-blue-900">OTP Verification</span>
+                    </div>
+                    <p className="text-blue-700 text-sm mb-3">Enter the 6-digit OTP sent to {user.email}</p>
+                    <input
+                      type="text"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      placeholder="Enter 6-digit OTP"
+                      className="w-full px-3 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-center text-lg font-mono"
+                      maxLength={6}
+                    />
+                  </div>
+                  <div className="flex space-x-3">
+                    <button
+                      type="button"
+                      onClick={handleOTPVerification}
+                      disabled={otpLoading || otp.length !== 6}
+                      className="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50 transition-colors flex items-center justify-center"
+                    >
+                      <Shield className="h-5 w-5 mr-2" />
+                      {otpLoading ? 'Verifying...' : 'Verify & Place Order'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowOTPStep(false);
+                        setOtp('');
+                        setError('');
+                      }}
+                      className="px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      Back
+                    </button>
+                  </div>
+                </div>
+              )}
             </form>
           </div>
 
@@ -184,7 +251,7 @@ const Checkout = () => {
                     </div>
                   </div>
                   <span className="font-semibold text-gray-900">
-                    ${(item.price * item.quantity).toFixed(2)}
+                    ₹{(item.price * item.quantity).toFixed(2)}
                   </span>
                 </div>
               ))}
@@ -193,7 +260,7 @@ const Checkout = () => {
             <div className="border-t pt-4">
               <div className="flex justify-between items-center text-lg font-bold text-gray-900">
                 <span>Total:</span>
-                <span>${total.toFixed(2)}</span>
+                <span>₹{total.toFixed(2)}</span>
               </div>
             </div>
           </div>

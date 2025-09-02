@@ -7,6 +7,7 @@ interface IReview {
   comment: string;
   user: Types.ObjectId;
   createdAt: Date;
+  updatedAt?: Date;
 }
 
 interface IProduct {

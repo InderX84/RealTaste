@@ -6,6 +6,9 @@ import { store } from './store/store';
 import { loadUser } from './store/slices/authSlice';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 import { ToastProvider } from './contexts/ToastContext';
+import { useSettings } from './hooks/useSettings';
+import Preloader from './components/ui/Preloader';
+import Maintenance from './pages/Maintenance';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import Home from './pages/Home';
@@ -16,6 +19,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
 import Profile from './pages/Profile';
 import Orders from './pages/Orders';
 import Checkout from './pages/Checkout';
@@ -25,30 +30,35 @@ import AdminProducts from './pages/admin/AdminProducts';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminCategories from './pages/admin/AdminCategories';
+import AdminSettings from './pages/admin/AdminSettings';
 
 const AppContent = () => {
   const dispatch = useDispatch();
+  const { user } = useSelector(state => state.auth);
   const { loading } = useSelector(state => state.auth);
+  const { settings, loading: settingsLoading } = useSettings();
   const [initialLoad, setInitialLoad] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token) {
-      dispatch(loadUser()).finally(() => setInitialLoad(false));
-    } else {
-      setInitialLoad(false);
-    }
+    const timer = setTimeout(() => {
+      if (token) {
+        dispatch(loadUser()).finally(() => setInitialLoad(false));
+      } else {
+        setInitialLoad(false);
+      }
+    }, 2000); // Show preloader for at least 2 seconds
+
+    return () => clearTimeout(timer);
   }, [dispatch]);
 
-  if (initialLoad) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading Real Taste...</p>
-        </div>
-      </div>
-    );
+  if (initialLoad || settingsLoading) {
+    return <Preloader />;
+  }
+
+  // Show maintenance page if enabled and user is not admin
+  if (settings.maintenanceMode && (!user || user.role !== 'admin')) {
+    return <Maintenance />;
   }
 
   return (
@@ -65,6 +75,8 @@ const AppContent = () => {
             <Route path="/register" element={<Register />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/checkout" element={<Checkout />} />
@@ -73,6 +85,7 @@ const AppContent = () => {
             <Route path="/admin/orders" element={<AdminRoute><AdminOrders /></AdminRoute>} />
             <Route path="/admin/categories" element={<AdminRoute><AdminCategories /></AdminRoute>} />
             <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+            <Route path="/admin/settings" element={<AdminRoute><AdminSettings /></AdminRoute>} />
           </Routes>
         </main>
         <Footer />
