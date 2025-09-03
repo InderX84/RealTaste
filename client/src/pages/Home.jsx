@@ -10,7 +10,7 @@ const Home = () => {
   const { featuredProducts = [], loading } = useSelector(state => state.products);
 
   useEffect(() => {
-    dispatch(fetchFeaturedProducts());
+    // dispatch(fetchFeaturedProducts());
   }, [dispatch]);
 
   return (

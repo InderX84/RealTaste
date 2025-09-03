@@ -6,7 +6,7 @@ import { store } from './store/store';
 import { loadUser } from './store/slices/authSlice';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 import { ToastProvider } from './contexts/ToastContext';
-import { useSettings } from './hooks/useSettings';
+
 import Preloader from './components/ui/Preloader';
 import Maintenance from './pages/Maintenance';
 import Header from './components/layout/Header';
@@ -36,7 +36,7 @@ const AppContent = () => {
   const dispatch = useDispatch();
   const { user } = useSelector(state => state.auth);
   const { loading } = useSelector(state => state.auth);
-  const { settings, loading: settingsLoading } = useSettings();
+
   const [initialLoad, setInitialLoad] = useState(true);
 
   useEffect(() => {
@@ -52,14 +52,14 @@ const AppContent = () => {
     return () => clearTimeout(timer);
   }, [dispatch]);
 
-  if (initialLoad || settingsLoading) {
+  if (initialLoad) {
     return <Preloader />;
   }
 
   // Show maintenance page if enabled and user is not admin
-  if (settings.maintenanceMode && (!user || user.role !== 'admin')) {
-    return <Maintenance />;
-  }
+  // if (settings.maintenanceMode && (!user || user.role !== 'admin')) {
+  //   return <Maintenance />;
+  // }
 
   return (
     <Router>

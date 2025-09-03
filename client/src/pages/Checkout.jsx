@@ -34,14 +34,10 @@ const Checkout = () => {
     try {
       const newOrderData = {
         items: items.map(item => ({
-          product: item._id,
-          quantity: item.quantity,
-          price: item.price
+          menuItem: item._id,
+          quantity: item.quantity
         })),
-        totalAmount: parseFloat(total.toFixed(2)),
-        paymentMethod: 'Pay at Shop',
-        mobileNumber: data.mobileNumber,
-        specialInstructions: data.specialInstructions || ''
+        totalAmount: parseFloat(total.toFixed(2))
       };
 
       // Send OTP to user's email
@@ -69,18 +65,24 @@ const Checkout = () => {
 
     try {
       // Verify OTP
-      await api.post('/api/otp/verify', { email: user.email, otp });
+      const verifyResponse = await api.post('/api/otp/verify', { email: user.email, otp });
       
-      // Place order after OTP verification
-      const response = await api.post('/api/orders', orderData);
-      
-      if (response.data.success) {
-        dispatch(clearCart());
-        toast.success('Order placed successfully! 🎉');
-        navigate('/orders');
+      if (verifyResponse.data.success) {
+        // Place order via API
+        const response = await api.post('/api/orders', orderData);
+        
+        if (response.data.success) {
+          dispatch(clearCart());
+          toast.success('Order placed successfully! 🎉');
+          navigate('/orders');
+        } else {
+          throw new Error(response.data.message || 'Failed to place order');
+        }
+      } else {
+        throw new Error('OTP verification failed');
       }
     } catch (err) {
-      const errorMsg = err.response?.data?.message || 'Invalid OTP';
+      const errorMsg = err.response?.data?.message || err.message || 'Order placement failed';
       setError(errorMsg);
       toast.error(errorMsg);
     } finally {

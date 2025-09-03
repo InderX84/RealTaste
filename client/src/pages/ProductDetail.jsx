@@ -22,7 +22,6 @@ const ProductDetail = () => {
 
   useEffect(() => {
     fetchProduct();
-    fetchReviews();
   }, [id]);
 
   const fetchProduct = async () => {
@@ -36,14 +35,7 @@ const ProductDetail = () => {
     }
   };
 
-  const fetchReviews = async () => {
-    try {
-      const { data } = await api.get(`/api/products/${id}/reviews`);
-      setReviews(data.data || []);
-    } catch (error) {
-      console.error('Failed to load reviews');
-    }
-  };
+
 
   const handleAddToCart = () => {
     dispatch(addToCart({ ...product, quantity }));
@@ -58,12 +50,11 @@ const ProductDetail = () => {
     }
     
     try {
-      await api.post(`/api/products/${id}/reviews`, reviewData);
-      toast.success(editingReview ? 'Review updated successfully! ⭐' : 'Review submitted successfully! ⭐');
+      // Simulate review submission
+      toast.success('Review feature coming soon! ⭐');
       setReviewData({ rating: 5, comment: '' });
       setShowReviewForm(false);
       setEditingReview(false);
-      fetchReviews();
     } catch (error) {
       toast.error('Failed to submit review');
     }
@@ -152,105 +143,12 @@ const ProductDetail = () => {
         <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-8 border-2 border-amber-200">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-serif font-bold text-amber-900">Reviews</h2>
-            {isAuthenticated && (
-              <button
-                onClick={() => {
-                  const userReview = reviews.find(r => r.user?._id === user?.id);
-                  if (userReview) {
-                    setReviewData({ rating: userReview.rating, comment: userReview.comment });
-                    setEditingReview(true);
-                  } else {
-                    setReviewData({ rating: 5, comment: '' });
-                    setEditingReview(false);
-                  }
-                  setShowReviewForm(!showReviewForm);
-                }}
-                className="bg-amber-700 text-yellow-100 px-4 py-2 rounded-lg font-serif hover:bg-amber-800"
-              >
-                {reviews.find(r => r.user?._id === user?.id) ? 'Edit Review' : 'Write Review'}
-              </button>
-            )}
           </div>
 
-          {/* Review Form */}
-          {showReviewForm && (
-            <form onSubmit={handleReviewSubmit} className="mb-8 p-6 bg-amber-50 rounded-2xl border border-amber-200">
-              <h3 className="text-lg font-serif font-bold text-amber-900 mb-4">
-                {editingReview ? 'Edit Your Review' : 'Write a Review'}
-              </h3>
-              <div className="mb-4">
-                <label className="block text-amber-800 font-serif font-semibold mb-2">Rating</label>
-                <div className="flex space-x-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setReviewData({ ...reviewData, rating: star })}
-                      className="p-1"
-                    >
-                      <Star
-                        className={`h-6 w-6 ${star <= reviewData.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="mb-4">
-                <label className="block text-amber-800 font-serif font-semibold mb-2">Comment</label>
-                <textarea
-                  value={reviewData.comment}
-                  onChange={(e) => setReviewData({ ...reviewData, comment: e.target.value })}
-                  className="w-full px-4 py-3 border border-amber-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 font-serif"
-                  rows="4"
-                  placeholder="Share your experience..."
-                  required
-                />
-              </div>
-              <div className="flex space-x-3">
-                <button
-                  type="submit"
-                  className="bg-amber-700 text-yellow-100 px-6 py-2 rounded-lg font-serif hover:bg-amber-800"
-                >
-                  {editingReview ? 'Update Review' : 'Submit Review'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowReviewForm(false)}
-                  className="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg font-serif hover:bg-gray-400"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          )}
 
-          {/* Reviews List */}
-          <div className="space-y-6">
-            {reviews.length === 0 ? (
-              <p className="text-amber-700 font-serif text-center py-8">No reviews yet. Be the first to review!</p>
-            ) : (
-              reviews.map((review) => (
-                <div key={review._id} className="border-b border-amber-200 pb-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center space-x-3">
-                      <div className="h-10 w-10 bg-amber-100 rounded-full flex items-center justify-center">
-                        <span className="text-amber-600 font-bold font-serif">
-                          {review.user?.name?.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div>
-                        <div className="font-serif font-semibold text-amber-900">{review.user?.name}</div>
-                        <div className="flex">{renderStars(review.rating)}</div>
-                      </div>
-                    </div>
-                    <span className="text-amber-600 font-serif text-sm">
-                      {new Date(review.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <p className="text-amber-800 font-serif">{review.comment}</p>
-                </div>
-              ))
-            )}
+
+          <div className="text-center py-8">
+            <p className="text-amber-700 font-serif">Reviews feature coming soon!</p>
           </div>
         </div>
       </div>
