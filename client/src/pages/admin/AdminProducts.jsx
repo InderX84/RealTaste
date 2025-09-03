@@ -117,7 +117,7 @@ const AdminProducts = () => {
                       <td className="table-cell-spacing whitespace-nowrap">
                         <div className="flex items-center">
                           <img 
-                            src={product.image || 'https://via.placeholder.com/60x60?text=No+Image'} 
+                            src={product.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=60&h=60&fit=crop&crop=center'} 
                             alt={product.name}
                             className="h-14 w-14 rounded-xl object-cover shadow-md"
                           />

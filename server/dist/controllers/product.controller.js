@@ -12,8 +12,7 @@ class ProductController extends base_controller_1.default {
         this.getByCategory = async (req, res, next) => {
             try {
                 const { categoryId } = req.params;
-                const products = await models_1.Product.find({ categoryId })
-                    .populate('categoryId')
+                const products = await models_1.Product.find({ category: categoryId })
                     .sort('-createdAt');
                 res.status(200).json({
                     success: true,
@@ -34,7 +33,7 @@ class ProductController extends base_controller_1.default {
                         { name: { $regex: query, $options: 'i' } },
                         { description: { $regex: query, $options: 'i' } }
                     ]
-                }).populate('categoryId');
+                });
                 res.status(200).json({
                     success: true,
                     count: products.length,
@@ -49,7 +48,6 @@ class ProductController extends base_controller_1.default {
         this.getFeatured = async (req, res, next) => {
             try {
                 const products = await models_1.Product.find({ featured: true, isAvailable: true })
-                    .populate('categoryId')
                     .limit(10);
                 res.status(200).json({
                     success: true,
@@ -75,9 +73,11 @@ class ProductController extends base_controller_1.default {
                 const review = {
                     rating: Number(rating),
                     comment,
-                    user: req.user?.id ? require('mongoose').Types.ObjectId(req.user.id) : undefined
+                    user: req.user?.id ? require('mongoose').Types.ObjectId(req.user.id) : undefined,
+                    createdAt: new Date()
                 };
-                product.ratings.push(review);
+                product.reviews = product.reviews || [];
+                product.reviews.push(review);
                 if (typeof product.calculateAverageRating === 'function') {
                     await product.calculateAverageRating();
                 }

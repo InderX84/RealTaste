@@ -21,15 +21,15 @@ const productSchema = new mongoose_1.Schema({
     category: {
         type: String,
         required: [true, 'Please select category'],
-        enum: {
-            values: ['Coffee', 'Tea', 'Beverages', 'Snacks', 'Desserts', 'Breakfast', 'Lunch'],
-            message: 'Please select correct category'
-        }
+        trim: true
     },
     image: {
         type: String,
         required: [true, 'Please add an image']
     },
+    images: [{
+            type: String
+        }],
     stock: {
         type: Number,
         required: [true, 'Please enter product stock'],
@@ -44,7 +44,7 @@ const productSchema = new mongoose_1.Schema({
         type: Boolean,
         default: false
     },
-    ratings: [{
+    reviews: [{
             rating: {
                 type: Number,
                 required: true,
@@ -60,6 +60,10 @@ const productSchema = new mongoose_1.Schema({
                 type: mongoose_1.Schema.Types.ObjectId,
                 ref: 'User',
                 required: true
+            },
+            createdAt: {
+                type: Date,
+                default: Date.now
             }
         }],
     numOfReviews: {
@@ -74,12 +78,12 @@ productSchema.index({ name: 'text', category: 1 });
 productSchema.index({ isAvailable: 1, featured: 1 });
 // Add calculateAverageRating method after schema declaration
 productSchema.methods.calculateAverageRating = async function () {
-    if (this.ratings.length === 0) {
+    if (this.reviews.length === 0) {
         this.numOfReviews = 0;
         return;
     }
-    const avg = this.ratings.reduce((acc, r) => acc + r.rating, 0) / this.ratings.length;
-    this.numOfReviews = this.ratings.length;
+    const avg = this.reviews.reduce((acc, r) => acc + r.rating, 0) / this.reviews.length;
+    this.numOfReviews = this.reviews.length;
     await this.save();
     return avg;
 };

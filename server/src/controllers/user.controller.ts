@@ -158,6 +158,49 @@ class UserController extends BaseController {
     }
   };
 
+  // Get all users (admin only)
+  getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const users = await User.find().select('-password').sort({ createdAt: -1 });
+      
+      res.status(200).json({
+        success: true,
+        data: users
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // Update user by admin
+  updateUserByAdmin = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { role, isActive } = req.body;
+      const userId = req.params.id;
+      
+      const user = await User.findByIdAndUpdate(
+        userId,
+        { role, isActive },
+        { new: true, runValidators: true }
+      ).select('-password');
+      
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+      }
+      
+      res.status(200).json({
+        success: true,
+        data: user,
+        message: 'User updated successfully'
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   // Generate JWT Token
   private generateToken(userId: string): string {
     const secret = process.env.JWT_SECRET;

@@ -36,7 +36,7 @@ const orderSchema = new Schema<IOrder>({
     required: true
   },
   items: [{
-    product: {
+    menuItem: {
       type: Schema.Types.ObjectId,
       ref: 'Product',
       required: true

@@ -11,6 +11,7 @@ const ProductForm = ({ product, onClose }) => {
   const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [imageUrls, setImageUrls] = useState(product?.images || ['']);
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: product || {
       name: '',
@@ -47,7 +48,8 @@ const ProductForm = ({ product, onClose }) => {
         description: data.description,
         price: parseFloat(data.price),
         category: data.category,
-        image: data.image || 'https://placehold.co/300x200/f3f4f6/6b7280?text=No+Image',
+        image: data.image || imageUrls[0] || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&h=200&fit=crop&crop=center',
+        images: imageUrls.filter(url => url.trim() !== ''),
         stock: parseInt(data.stock),
         isAvailable: Boolean(data.isAvailable),
         featured: Boolean(data.featured)
@@ -154,13 +156,53 @@ const ProductForm = ({ product, onClose }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-amber-800 mb-3">Image URL (Optional)</label>
+              <label className="block text-sm font-semibold text-amber-800 mb-3">Main Image URL</label>
               <input
                 {...register('image')}
                 type="url"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-lg"
                 placeholder="https://example.com/image.jpg"
               />
+            </div>
+          </div>
+
+          <div className="bg-blue-50 card-spacing rounded-2xl border border-blue-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Additional Images (Optional)</h3>
+            <div className="space-y-3">
+              {imageUrls.map((url, index) => (
+                <div key={index} className="flex items-center space-x-3">
+                  <input
+                    type="url"
+                    value={url}
+                    onChange={(e) => {
+                      const newUrls = [...imageUrls];
+                      newUrls[index] = e.target.value;
+                      setImageUrls(newUrls);
+                    }}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder={`Image URL ${index + 1}`}
+                  />
+                  {imageUrls.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newUrls = imageUrls.filter((_, i) => i !== index);
+                        setImageUrls(newUrls);
+                      }}
+                      className="text-red-600 hover:text-red-800 p-2"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => setImageUrls([...imageUrls, ''])}
+                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+              >
+                + Add Another Image URL
+              </button>
             </div>
           </div>
 

@@ -1,7 +1,14 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const API_URL = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/products`;
+const getApiUrl = () => {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 
+    (import.meta.env.MODE === 'production' 
+      ? 'https://realtaste.onrender.com' 
+      : 'http://localhost:5000');
+  return `${baseUrl}/api/products`;
+};
+const API_URL = getApiUrl();
 
 export const fetchProducts = createAsyncThunk('products/fetchProducts', async (_, { rejectWithValue }) => {
   try {
@@ -14,10 +21,23 @@ export const fetchProducts = createAsyncThunk('products/fetchProducts', async (_
 
 export const fetchFeaturedProducts = createAsyncThunk('products/fetchFeatured', async (_, { rejectWithValue }) => {
   try {
-    const { data } = await axios.get(`${API_URL}/featured`);
+    // Try featured products first, fallback to regular products
+    let data;
+    try {
+      const response = await axios.get(`${API_URL}/featured`);
+      data = response.data;
+    } catch (featuredError) {
+      // Fallback: Get regular products and take first 6
+      const response = await axios.get(API_URL);
+      const allProducts = response.data.data || response.data.products || [];
+      data = {
+        data: allProducts.slice(0, 6),
+        success: true
+      };
+    }
     return data;
   } catch (error) {
-    return rejectWithValue(error.response.data.message);
+    return rejectWithValue(error.response?.data?.message || 'Failed to fetch products');
   }
 });
 

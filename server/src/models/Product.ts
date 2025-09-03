@@ -16,6 +16,7 @@ interface IProduct {
   price: number;
   category: string;
   image: string;
+  images?: string[];
   stock: number;
   isAvailable: boolean;
   featured: boolean;
@@ -51,6 +52,9 @@ const productSchema = new Schema<IProduct>({
     type: String,
     required: [true, 'Please add an image']
   },
+  images: [{
+    type: String
+  }],
   stock: {
     type: Number,
     required: [true, 'Please enter product stock'],

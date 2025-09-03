@@ -39,11 +39,11 @@ app.get('/', (req: Request, res: Response) => {
 import userRoutes from './routes/user.routes';
 import productRoutes from './routes/product.routes';
 import cartRoutes from './routes/cart.routes';
-import orderRoutes from './routes/order.routes';
+import orderRoutes from './routes/simple-order.routes';
 import categoryRoutes from './routes/category.routes';
 import contactRoutes from './routes/contact.routes';
 import otpRoutes from './routes/otp.routes';
-import settingRoutes from './routes/setting.routes';
+import newSettingsRoutes from './routes/settings.routes';
 import bulkRoutes from './routes/bulk.routes';
 import adminSettingsRoutes from './routes/admin-settings.routes';
 
@@ -55,7 +55,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/otp', otpRoutes);
-app.use('/api/settings', settingRoutes);
+app.use('/api/settings', newSettingsRoutes);
 app.use('/api/bulk', bulkRoutes);
 app.use('/api/admin/settings', adminSettingsRoutes);
 

@@ -9,15 +9,11 @@ const router = express.Router();
 // Validation rules
 const orderValidation = [
   body('items').isArray().withMessage('Items must be an array'),
-  body('items.*.product').notEmpty().withMessage('Product ID is required'),
+  body('items.*.menuItem').notEmpty().withMessage('Menu item ID is required'),
   body('items.*.quantity')
     .isInt({ min: 1 })
     .withMessage('Quantity must be at least 1'),
-  body('totalAmount').isNumeric().withMessage('Total amount is required'),
-  body('shippingAddress').notEmpty().withMessage('Shipping address is required'),
-  body('paymentMethod')
-    .isIn(['Cash', 'Card'])
-    .withMessage('Invalid payment method')
+  body('totalAmount').isNumeric().withMessage('Total amount is required')
 ];
 
 // Protected routes
@@ -25,12 +21,12 @@ router.use(protect);
 
 router.post('/', validate(orderValidation), OrderController.create);
 router.get('/my-orders', OrderController.getUserOrders);
-router.get('/:id', OrderController.getOne);
+router.get('/:id', OrderController.getById);
 
-// Admin routes
-router.get('/', authorize('admin'), OrderController.getAll);
-router.put('/:id/status', authorize('admin'), OrderController.updateOrderStatus);
-router.put('/:id/pay', authorize('admin'), OrderController.markOrderAsPaid);
-router.get('/stats', authorize('admin'), OrderController.getOrderStats);
+// Admin routes (must be before /:id route)
+router.get('/all', protect, authorize('admin'), OrderController.getAll);
+router.get('/stats', protect, authorize('admin'), OrderController.getOrderStats);
+router.put('/:id/status', protect, authorize('admin'), OrderController.updateOrderStatus);
+router.put('/:id/pay', protect, authorize('admin'), OrderController.markOrderAsPaid);
 
 export default router;

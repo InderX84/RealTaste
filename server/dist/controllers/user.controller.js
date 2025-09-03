@@ -140,6 +140,41 @@ class UserController extends base_controller_1.default {
                 next(error);
             }
         };
+        // Get all users (admin only)
+        this.getAllUsers = async (req, res, next) => {
+            try {
+                const users = await models_1.User.find().select('-password').sort({ createdAt: -1 });
+                res.status(200).json({
+                    success: true,
+                    data: users
+                });
+            }
+            catch (error) {
+                next(error);
+            }
+        };
+        // Update user by admin
+        this.updateUserByAdmin = async (req, res, next) => {
+            try {
+                const { role, isActive } = req.body;
+                const userId = req.params.id;
+                const user = await models_1.User.findByIdAndUpdate(userId, { role, isActive }, { new: true, runValidators: true }).select('-password');
+                if (!user) {
+                    return res.status(404).json({
+                        success: false,
+                        message: 'User not found'
+                    });
+                }
+                res.status(200).json({
+                    success: true,
+                    data: user,
+                    message: 'User updated successfully'
+                });
+            }
+            catch (error) {
+                next(error);
+            }
+        };
     }
     // Generate JWT Token
     generateToken(userId) {

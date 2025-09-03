@@ -6,3 +6,4 @@ export { default as Product } from './Product';
 export { default as Cart } from './Cart';
 export { default as Category } from './Category';
 export { default as AdminSettings } from './AdminSettings';
+export { default as ShopSettings } from './ShopSettings';

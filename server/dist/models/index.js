@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AdminSettings = exports.Category = exports.Cart = exports.Product = exports.ContactMessage = exports.Order = exports.MenuItem = exports.User = void 0;
+exports.ShopSettings = exports.AdminSettings = exports.Category = exports.Cart = exports.Product = exports.ContactMessage = exports.Order = exports.MenuItem = exports.User = void 0;
 var User_1 = require("./User");
 Object.defineProperty(exports, "User", { enumerable: true, get: function () { return __importDefault(User_1).default; } });
 var MenuItem_1 = require("./MenuItem");
@@ -20,3 +20,5 @@ var Category_1 = require("./Category");
 Object.defineProperty(exports, "Category", { enumerable: true, get: function () { return __importDefault(Category_1).default; } });
 var AdminSettings_1 = require("./AdminSettings");
 Object.defineProperty(exports, "AdminSettings", { enumerable: true, get: function () { return __importDefault(AdminSettings_1).default; } });
+var ShopSettings_1 = require("./ShopSettings");
+Object.defineProperty(exports, "ShopSettings", { enumerable: true, get: function () { return __importDefault(ShopSettings_1).default; } });

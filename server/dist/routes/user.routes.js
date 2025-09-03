@@ -29,7 +29,8 @@ router.get('/me', auth_1.protect, controllers_1.UserController.getProfile);
 router.put('/profile', auth_1.protect, controllers_1.UserController.updateProfile);
 router.put('/password', auth_1.protect, controllers_1.UserController.updatePassword);
 // Admin routes
-router.get('/', auth_1.protect, (0, auth_1.authorize)('admin'), controllers_1.UserController.getAll);
+router.get('/', auth_1.protect, (0, auth_1.authorize)('admin'), controllers_1.UserController.getAllUsers);
 router.get('/:id', auth_1.protect, (0, auth_1.authorize)('admin'), controllers_1.UserController.getOne);
+router.put('/:id', auth_1.protect, (0, auth_1.authorize)('admin'), controllers_1.UserController.updateUserByAdmin);
 router.delete('/:id', auth_1.protect, (0, auth_1.authorize)('admin'), controllers_1.UserController.delete);
 exports.default = router;

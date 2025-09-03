@@ -30,8 +30,9 @@ router.put('/profile', protect, UserController.updateProfile);
 router.put('/password', protect, UserController.updatePassword);
 
 // Admin routes
-router.get('/', protect, authorize('admin'), UserController.getAll);
+router.get('/', protect, authorize('admin'), UserController.getAllUsers);
 router.get('/:id', protect, authorize('admin'), UserController.getOne);
+router.put('/:id', protect, authorize('admin'), UserController.updateUserByAdmin);
 router.delete('/:id', protect, authorize('admin'), UserController.delete);
 
 export default router;

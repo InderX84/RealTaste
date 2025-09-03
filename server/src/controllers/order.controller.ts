@@ -16,11 +16,11 @@ class OrderController extends BaseController {
       // Verify products and calculate total
       let calculatedTotal = 0;
       for (const item of items) {
-        const product = await Product.findById(item.product);
+        const product = await Product.findById(item.menuItem);
         if (!product) {
           res.status(404).json({
             success: false,
-            message: `Product not found: ${item.product}`
+            message: `Product not found: ${item.menuItem}`
           });
           return;
         }
@@ -48,7 +48,7 @@ class OrderController extends BaseController {
 
       // Update product stock
       for (const item of items) {
-        const product = await Product.findById(item.product);
+        const product = await Product.findById(item.menuItem);
         if (product) {
           product.stock -= item.quantity;
           await product.save();
@@ -92,7 +92,7 @@ class OrderController extends BaseController {
   getUserOrders = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const orders = await Order.find({ user: req.user?.id })
-        .populate('items.product')
+        .populate('items.menuItem')
         .populate('user', 'name email')
         .sort('-createdAt');
 
@@ -110,7 +110,7 @@ class OrderController extends BaseController {
   getAll = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const orders = await Order.find()
-        .populate('items.product')
+        .populate('items.menuItem')
         .populate('user', 'name email')
         .sort('-createdAt');
 
@@ -205,6 +205,37 @@ class OrderController extends BaseController {
       res.status(200).json({
         success: true,
         data: updatedOrder
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // Get single order by ID
+  getById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const order = await Order.findById(req.params.id)
+        .populate('items.menuItem')
+        .populate('user', 'name email');
+
+      if (!order) {
+        return res.status(404).json({
+          success: false,
+          message: 'Order not found'
+        });
+      }
+
+      // Check if user owns the order or is admin
+      if (order.user._id.toString() !== req.user?.id && req.user?.role !== 'admin') {
+        return res.status(403).json({
+          success: false,
+          message: 'Not authorized to access this order'
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: order
       });
     } catch (error) {
       next(error);

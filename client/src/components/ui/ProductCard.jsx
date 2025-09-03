@@ -1,12 +1,21 @@
 import { useDispatch } from 'react-redux';
-import { Plus, Star, Eye } from 'lucide-react';
+import { Plus, Star, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { addToCart } from '../../store/slices/cartSlice';
 import { useToast } from '../../contexts/ToastContext';
+import { useState } from 'react';
 
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
   const toast = useToast();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  const allImages = [
+    product.image,
+    ...(product.images || [])
+  ].filter(img => img && img.trim() !== '');
+  
+  const hasMultipleImages = allImages.length > 1;
 
   const handleAddToCart = () => {
     dispatch(addToCart(product));
@@ -22,14 +31,54 @@ const ProductCard = ({ product }) => {
   }
 
   return (
-    <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 group border-2 border-amber-100 hover:border-amber-200">
+    <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl overflow-hidden card-hover group border-2 border-amber-100 hover:border-amber-200 animate-fade-in">
       <div className="relative overflow-hidden">
         <img 
-          src={product.image || 'https://placehold.co/400x300/f3f4f6/6b7280?text=No+Image'} 
+          src={allImages[currentImageIndex] || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop&crop=center'} 
           alt={product.name}
           className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        
+        {/* Image Navigation */}
+        {hasMultipleImages && (
+          <>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                setCurrentImageIndex(prev => prev === 0 ? allImages.length - 1 : prev - 1);
+              }}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                setCurrentImageIndex(prev => prev === allImages.length - 1 ? 0 : prev + 1);
+              }}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+            
+            {/* Image Dots */}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              {allImages.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setCurrentImageIndex(index);
+                  }}
+                  className={`w-2 h-2 rounded-full transition-colors ${
+                    index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                  }`}
+                />
+              ))}
+            </div>
+          </>
+        )}
         
         {/* Price Badge */}
         <div className="absolute top-4 right-4">
@@ -43,6 +92,15 @@ const ProductCard = ({ product }) => {
           <div className="absolute top-4 left-4">
             <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg animate-pulse">
               ⭐ Featured
+            </div>
+          </div>
+        )}
+        
+        {/* Multiple Images Indicator */}
+        {hasMultipleImages && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2">
+            <div className="bg-black/50 text-white px-2 py-1 rounded-full text-xs font-medium">
+              {currentImageIndex + 1}/{allImages.length}
             </div>
           </div>
         )}

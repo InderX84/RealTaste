@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Settings, Save, Phone, Mail, MapPin, Clock } from 'lucide-react';
 import { useToast } from '../../contexts/ToastContext';
 import AdminLayout from '../../components/admin/AdminLayout';
+import api from '../../utils/api';
 
 const AdminSettings = () => {
   const toast = useToast();
   const [loading, setLoading] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(true);
   const [settings, setSettings] = useState({
     shopName: 'Real Taste Takeaway',
     phone: '+91 9465520816',
@@ -13,10 +15,28 @@ const AdminSettings = () => {
     address: 'UpalHeri, Rajpura, Punjab 140401',
     openTime: '10:00',
     closeTime: '21:00',
-    preparationTime: '15',
+    preparationTime: 15,
     isOpen: true,
-    maintenanceMode: false
+    maintenanceMode: false,
+    otpVerification: true
   });
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const fetchSettings = async () => {
+    try {
+      const { data } = await api.get('/api/settings');
+      if (data.success) {
+        setSettings(data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch settings:', error);
+    } finally {
+      setFetchLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -31,11 +51,14 @@ const AdminSettings = () => {
     setLoading(true);
     
     try {
-      // Simulate API call since settings endpoint doesn't exist
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success('Settings saved successfully! ✅');
+      const { data } = await api.put('/api/settings', settings);
+      if (data.success) {
+        toast.success('Settings saved successfully! ✅');
+      } else {
+        throw new Error(data.message || 'Failed to save settings');
+      }
     } catch (error) {
-      toast.error('Failed to save settings');
+      toast.error(error.response?.data?.message || 'Failed to save settings');
     } finally {
       setLoading(false);
     }
@@ -50,8 +73,13 @@ const AdminSettings = () => {
           <p className="text-amber-700">Manage your takeaway shop configuration</p>
         </div>
 
-        <div className="max-w-4xl mx-auto">
-          <form onSubmit={handleSave} className="space-y-8">
+        {fetchLoading ? (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+          </div>
+        ) : (
+          <div className="max-w-4xl mx-auto">
+            <form onSubmit={handleSave} className="space-y-8">
             {/* Basic Information */}
             <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl card-spacing border-2 border-amber-200">
               <h2 className="text-2xl font-serif font-bold text-amber-900 mb-6 flex items-center">
@@ -182,6 +210,17 @@ const AdminSettings = () => {
                   <span className="ml-3 text-base font-medium text-gray-700">Enable maintenance mode</span>
                 </label>
                 
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="otpVerification"
+                    checked={settings.otpVerification}
+                    onChange={handleChange}
+                    className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="ml-3 text-base font-medium text-gray-700">Enable OTP verification for orders</span>
+                </label>
+                
                 {settings.maintenanceMode && (
                   <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                     <p className="text-red-800 text-sm">
@@ -203,8 +242,9 @@ const AdminSettings = () => {
                 <span>{loading ? 'Saving...' : 'Save Settings'}</span>
               </button>
             </div>
-          </form>
-        </div>
+            </form>
+          </div>
+        )}
       </div>
     </AdminLayout>
   );

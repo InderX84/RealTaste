@@ -21,6 +21,14 @@ const transporter = nodemailer.createTransport({
 export const sendOTP = async (req: AuthRequest, res: Response) => {
   try {
     const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required'
+      });
+    }
+    
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     
     // Store OTP with 5 minute expiry
@@ -54,7 +62,10 @@ export const sendOTP = async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     console.error('Send OTP error:', error);
-    res.status(500).json({ message: 'Failed to send OTP' });
+    res.status(500).json({ 
+      success: false,
+      message: 'Failed to send OTP' 
+    });
   }
 };
 
@@ -62,19 +73,35 @@ export const verifyOTP = async (req: AuthRequest, res: Response) => {
   try {
     const { email, otp } = req.body;
     
+    if (!email || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email and OTP are required'
+      });
+    }
+    
     const storedData = otpStore.get(email);
     
     if (!storedData) {
-      return res.status(400).json({ message: 'OTP not found or expired' });
+      return res.status(400).json({ 
+        success: false,
+        message: 'OTP not found or expired' 
+      });
     }
     
     if (Date.now() > storedData.expires) {
       otpStore.delete(email);
-      return res.status(400).json({ message: 'OTP expired' });
+      return res.status(400).json({ 
+        success: false,
+        message: 'OTP expired' 
+      });
     }
     
     if (storedData.otp !== otp) {
-      return res.status(400).json({ message: 'Invalid OTP' });
+      return res.status(400).json({ 
+        success: false,
+        message: 'Invalid OTP' 
+      });
     }
     
     // OTP verified, remove from store
@@ -86,6 +113,9 @@ export const verifyOTP = async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     console.error('Verify OTP error:', error);
-    res.status(500).json({ message: 'Failed to verify OTP' });
+    res.status(500).json({ 
+      success: false,
+      message: 'Failed to verify OTP' 
+    });
   }
 };

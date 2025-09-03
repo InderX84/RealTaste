@@ -35,15 +35,23 @@ app.get('/', (req, res) => {
 const user_routes_1 = __importDefault(require("./routes/user.routes"));
 const product_routes_1 = __importDefault(require("./routes/product.routes"));
 const cart_routes_1 = __importDefault(require("./routes/cart.routes"));
-const order_routes_1 = __importDefault(require("./routes/order.routes"));
+const simple_order_routes_1 = __importDefault(require("./routes/simple-order.routes"));
 const category_routes_1 = __importDefault(require("./routes/category.routes"));
+const contact_routes_1 = __importDefault(require("./routes/contact.routes"));
+const otp_routes_1 = __importDefault(require("./routes/otp.routes"));
+const settings_routes_1 = __importDefault(require("./routes/settings.routes"));
+const bulk_routes_1 = __importDefault(require("./routes/bulk.routes"));
 const admin_settings_routes_1 = __importDefault(require("./routes/admin-settings.routes"));
 // Mount all API routes
 app.use('/api/users', user_routes_1.default);
 app.use('/api/products', product_routes_1.default);
 app.use('/api/cart', cart_routes_1.default);
-app.use('/api/orders', order_routes_1.default);
+app.use('/api/orders', simple_order_routes_1.default);
 app.use('/api/categories', category_routes_1.default);
+app.use('/api/contact', contact_routes_1.default);
+app.use('/api/otp', otp_routes_1.default);
+app.use('/api/settings', settings_routes_1.default);
+app.use('/api/bulk', bulk_routes_1.default);
 app.use('/api/admin/settings', admin_settings_routes_1.default);
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -12,23 +12,20 @@ const router = express_1.default.Router();
 // Validation rules
 const orderValidation = [
     (0, express_validator_1.body)('items').isArray().withMessage('Items must be an array'),
-    (0, express_validator_1.body)('items.*.product').notEmpty().withMessage('Product ID is required'),
+    (0, express_validator_1.body)('items.*.menuItem').notEmpty().withMessage('Menu item ID is required'),
     (0, express_validator_1.body)('items.*.quantity')
         .isInt({ min: 1 })
         .withMessage('Quantity must be at least 1'),
-    (0, express_validator_1.body)('shippingAddress').notEmpty().withMessage('Shipping address is required'),
-    (0, express_validator_1.body)('paymentMethod')
-        .isIn(['Cash', 'Card'])
-        .withMessage('Invalid payment method')
+    (0, express_validator_1.body)('totalAmount').isNumeric().withMessage('Total amount is required')
 ];
 // Protected routes
 router.use(auth_1.protect);
 router.post('/', (0, validate_1.validate)(orderValidation), controllers_1.OrderController.create);
 router.get('/my-orders', controllers_1.OrderController.getUserOrders);
-router.get('/:id', controllers_1.OrderController.getOne);
-// Admin routes
-router.get('/', (0, auth_1.authorize)('admin'), controllers_1.OrderController.getAll);
-router.put('/:id/status', (0, auth_1.authorize)('admin'), controllers_1.OrderController.updateOrderStatus);
-router.put('/:id/pay', (0, auth_1.authorize)('admin'), controllers_1.OrderController.markOrderAsPaid);
-router.get('/stats', (0, auth_1.authorize)('admin'), controllers_1.OrderController.getOrderStats);
+router.get('/:id', controllers_1.OrderController.getById);
+// Admin routes (must be before /:id route)
+router.get('/all', auth_1.protect, (0, auth_1.authorize)('admin'), controllers_1.OrderController.getAll);
+router.get('/stats', auth_1.protect, (0, auth_1.authorize)('admin'), controllers_1.OrderController.getOrderStats);
+router.put('/:id/status', auth_1.protect, (0, auth_1.authorize)('admin'), controllers_1.OrderController.updateOrderStatus);
+router.put('/:id/pay', auth_1.protect, (0, auth_1.authorize)('admin'), controllers_1.OrderController.markOrderAsPaid);
 exports.default = router;

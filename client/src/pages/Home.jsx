@@ -10,7 +10,7 @@ const Home = () => {
   const { featuredProducts = [], loading } = useSelector(state => state.products);
 
   useEffect(() => {
-    // dispatch(fetchFeaturedProducts());
+    dispatch(fetchFeaturedProducts());
   }, [dispatch]);
 
   return (
@@ -23,20 +23,20 @@ const Home = () => {
           <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-yellow-600 opacity-20 rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-orange-400 opacity-25 rounded-full blur-2xl animate-pulse delay-1000"></div>
         </div>
-        <div className="relative z-10 text-center text-white px-6 max-w-6xl mx-auto">
+        <div className="relative z-10 text-center text-white px-6 max-w-6xl mx-auto animate-fade-in">
           <div className="mb-8">
             <Coffee className="h-20 w-20 text-yellow-400 mx-auto mb-6 animate-bounce" />
           </div>
-          <h1 className="text-6xl md:text-8xl font-serif font-bold mb-8 text-yellow-100 drop-shadow-2xl">
+          <h1 className="text-6xl md:text-8xl font-serif font-bold mb-8 text-yellow-100 drop-shadow-2xl animate-slide-up">
             Real Taste Café
           </h1>
-          <p className="text-xl md:text-2xl mb-6 font-light max-w-3xl mx-auto leading-relaxed text-amber-100">
+          <p className="text-xl md:text-2xl mb-6 font-light max-w-3xl mx-auto leading-relaxed text-amber-100 animate-slide-up animate-stagger-1">
             Your favorite <span className="font-semibold text-yellow-300">takeaway destination</span> for fresh food and <span className="font-semibold text-yellow-300">hot beverages</span>
           </p>
           <p className="text-lg text-yellow-300 italic font-serif mb-12">
             "Order karo, ready karo, le jao" - Order it, we'll prepare it, take it away
           </p>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center animate-slide-up animate-stagger-2">
             <Link 
               to="/menu" 
               className="bg-yellow-600 text-amber-900 px-10 py-4 rounded-full text-lg font-bold hover:bg-yellow-500 transition-all duration-300 transform hover:scale-105 shadow-2xl"
@@ -74,7 +74,7 @@ const Home = () => {
               { icon: Award, title: "Quality Food", desc: "Made with love and finest ingredients", emoji: "⭐" },
               { icon: Users, title: "Easy Ordering", desc: "Order online, pay at shop, take away", emoji: "📱" }
             ].map((feature, index) => (
-              <div key={index} className="group text-center p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-amber-200">
+              <div key={index} className={`group text-center p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg card-hover border border-amber-200 animate-fade-in animate-stagger-${index + 1}`}>
                 <div className="text-4xl mb-4">{feature.emoji}</div>
                 <h3 className="text-xl font-serif font-bold text-amber-900 mb-3 group-hover:text-amber-700 transition-colors">{feature.title}</h3>
                 <p className="text-amber-700 leading-relaxed text-sm">{feature.desc}</p>

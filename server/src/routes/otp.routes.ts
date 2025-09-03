@@ -4,7 +4,7 @@ import { protect } from '../middleware/auth';
 
 const router = express.Router();
 
-router.post('/send', protect, sendOTP);
-router.post('/verify', protect, verifyOTP);
+router.post('/send', sendOTP);
+router.post('/verify', verifyOTP);
 
 export default router;

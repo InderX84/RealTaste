@@ -34,72 +34,48 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const orderSchema = new mongoose_1.Schema({
-    user: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+const shopSettingsSchema = new mongoose_1.Schema({
+    shopName: {
+        type: String,
+        default: 'Real Taste Takeaway'
     },
-    items: [{
-            menuItem: {
-                type: mongoose_1.Schema.Types.ObjectId,
-                ref: 'Product',
-                required: true
-            },
-            quantity: {
-                type: Number,
-                required: true,
-                min: [1, 'Quantity must be at least 1']
-            },
-            price: {
-                type: Number,
-                required: true,
-                min: [0, 'Price cannot be negative']
-            }
-        }],
-    totalAmount: {
+    phone: {
+        type: String,
+        default: '+91 9465520816'
+    },
+    email: {
+        type: String,
+        default: 'hello@realtastecafe.com'
+    },
+    address: {
+        type: String,
+        default: 'UpalHeri, Rajpura, Punjab 140401'
+    },
+    openTime: {
+        type: String,
+        default: '10:00'
+    },
+    closeTime: {
+        type: String,
+        default: '21:00'
+    },
+    preparationTime: {
         type: Number,
-        required: true,
-        min: [0, 'Total amount cannot be negative']
+        default: 15
     },
-    status: {
-        type: String,
-        enum: ['Pending', 'Preparing', 'Ready', 'Delivered', 'Cancelled'],
-        default: 'Pending'
+    isOpen: {
+        type: Boolean,
+        default: true
     },
-    paymentStatus: {
-        type: String,
-        enum: ['Pending', 'Completed', 'Failed'],
-        default: 'Pending'
-    },
-    paymentMethod: {
-        type: String,
-        enum: ['Cash', 'Card'],
-        required: true
-    },
-    mobileNumber: {
-        type: String,
-        match: [/^[6-9]\d{9}$/, 'Please enter a valid mobile number']
-    },
-    specialInstructions: {
-        type: String,
-        maxlength: [500, 'Special instructions cannot be more than 500 characters']
-    },
-    isPaid: {
+    maintenanceMode: {
         type: Boolean,
         default: false
     },
-    paidAt: Date,
-    paymentResult: {
-        id: String,
-        status: String,
-        updateTime: String,
-        email: String
+    otpVerification: {
+        type: Boolean,
+        default: true
     }
 }, {
     timestamps: true
 });
-// Add index for better query performance
-orderSchema.index({ user: 1, createdAt: -1 });
-orderSchema.index({ status: 1 });
-exports.default = mongoose_1.default.model('Order', orderSchema);
+exports.default = mongoose_1.default.model('ShopSettings', shopSettingsSchema);

@@ -9,16 +9,12 @@ export default defineConfig({
       '/api': {
         target: process.env.VITE_API_BASE_URL || 'http://localhost:5000',
         changeOrigin: true,
-        secure: true,
+        secure: false,
       },
     },
   },
   build: {
     outDir: 'dist',
-    sourcemap: false,
     minify: 'esbuild',
-  },
-  define: {
-    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
   },
 })

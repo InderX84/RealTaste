@@ -19,6 +19,7 @@ const Checkout = () => {
   const [otp, setOtp] = useState('');
   const [otpLoading, setOtpLoading] = useState(false);
   const [orderData, setOrderData] = useState(null);
+  const [resendTimer, setResendTimer] = useState(0);
 
   const { register, handleSubmit, formState: { errors } } = useForm();
 
@@ -35,16 +36,49 @@ const Checkout = () => {
       const newOrderData = {
         items: items.map(item => ({
           menuItem: item._id,
-          quantity: item.quantity
+          quantity: item.quantity,
+          price: item.price
         })),
-        totalAmount: parseFloat(total.toFixed(2))
+        totalAmount: parseFloat(total.toFixed(2)),
+        paymentMethod: 'Cash'
       };
 
-      // Send OTP to user's email
-      await api.post('/api/otp/send', { email: user.email });
-      setOrderData(newOrderData);
-      setShowOTPStep(true);
-      toast.success('OTP sent to your email! 📧');
+      // Check if OTP verification is enabled
+      try {
+        const settingsResponse = await api.get('/api/settings');
+        const otpEnabled = settingsResponse.data?.data?.otpVerification ?? true;
+        
+        if (otpEnabled) {
+          // Send OTP to user's email
+          await api.post('/api/otp/send', { email: user.email });
+          setOrderData(newOrderData);
+          setShowOTPStep(true);
+          setResendTimer(60);
+          toast.success('OTP sent to your email! 📧');
+        } else {
+          // Direct order placement without OTP
+          const response = await api.post('/api/orders', newOrderData);
+          
+          if (response.data.success) {
+            dispatch(clearCart());
+            toast.success('Order placed successfully! 🎉');
+            navigate('/orders');
+          } else {
+            throw new Error(response.data.message || 'Failed to place order');
+          }
+        }
+      } catch (settingsError) {
+        // Fallback: Direct order placement if settings fetch fails
+        const response = await api.post('/api/orders', newOrderData);
+        
+        if (response.data.success) {
+          dispatch(clearCart());
+          toast.success('Order placed successfully! 🎉');
+          navigate('/orders');
+        } else {
+          throw new Error(response.data.message || 'Failed to place order');
+        }
+      }
     } catch (err) {
       const errorMsg = err.response?.data?.message || 'Failed to send OTP';
       setError(errorMsg);
@@ -89,6 +123,23 @@ const Checkout = () => {
       setOtpLoading(false);
     }
   };
+
+  const handleResendOTP = async () => {
+    try {
+      await api.post('/api/otp/send', { email: user.email });
+      setResendTimer(60);
+      toast.success('OTP resent to your email! 📧');
+    } catch (err) {
+      toast.error('Failed to resend OTP');
+    }
+  };
+
+  useEffect(() => {
+    if (resendTimer > 0) {
+      const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendTimer]);
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
@@ -205,7 +256,7 @@ const Checkout = () => {
                       maxLength={6}
                     />
                   </div>
-                  <div className="flex space-x-3">
+                  <div className="flex space-x-3 mb-3">
                     <button
                       type="button"
                       onClick={handleOTPVerification}
@@ -227,6 +278,16 @@ const Checkout = () => {
                       Back
                     </button>
                   </div>
+                  <div className="text-center">
+                    <button
+                      type="button"
+                      onClick={handleResendOTP}
+                      disabled={resendTimer > 0}
+                      className="text-blue-600 hover:text-blue-800 text-sm font-medium disabled:text-gray-400 disabled:cursor-not-allowed"
+                    >
+                      {resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : 'Resend OTP'}
+                    </button>
+                  </div>
                 </div>
               )}
             </form>
@@ -243,7 +304,7 @@ const Checkout = () => {
                 <div key={item._id} className="flex justify-between items-center">
                   <div className="flex items-center space-x-3">
                     <img 
-                      src={item.image || 'https://via.placeholder.com/50x50?text=No+Image'} 
+                      src={item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=50&h=50&fit=crop&crop=center'} 
                       alt={item.name}
                       className="w-12 h-12 rounded-lg object-cover"
                     />
