@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Coffee, Award, Clock, Users } from 'lucide-react';
 import { fetchFeaturedProducts } from '../store/slices/productSlice';
-import ProductCard from '../components/ui/ProductCard';
+import FeaturedSlider from '../components/ui/FeaturedSlider';
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -97,19 +97,11 @@ const Home = () => {
             <div className="flex justify-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
             </div>
+          ) : featuredProducts && featuredProducts.length > 0 ? (
+            <FeaturedSlider products={featuredProducts} />
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredProducts && featuredProducts.length > 0 ? (
-                featuredProducts.map(product => (
-                  <ProductCard key={product._id} product={product} />
-                ))
-              ) : (
-                !loading && (
-                  <div className="col-span-full text-center py-8">
-                    <p className="text-gray-500">No featured products available</p>
-                  </div>
-                )
-              )}
+            <div className="text-center py-8">
+              <p className="text-gray-500">No featured products available</p>
             </div>
           )}
           

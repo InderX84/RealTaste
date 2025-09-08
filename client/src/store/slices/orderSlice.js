@@ -62,7 +62,12 @@ const orderSlice = createSlice({
         if (updatedOrder) {
           const index = state.allOrders.findIndex(order => order._id === updatedOrder._id);
           if (index !== -1) {
-            state.allOrders[index] = updatedOrder;
+            // Preserve mobile number from original order if not in updated order
+            state.allOrders[index] = {
+              ...state.allOrders[index],
+              ...updatedOrder,
+              mobileNumber: updatedOrder.mobileNumber || state.allOrders[index].mobileNumber
+            };
           }
         }
       });

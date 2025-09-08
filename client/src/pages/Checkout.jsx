@@ -40,7 +40,9 @@ const Checkout = () => {
           price: item.price
         })),
         totalAmount: parseFloat(total.toFixed(2)),
-        paymentMethod: 'Cash'
+        paymentMethod: 'Cash',
+        mobileNumber: data.mobileNumber,
+        specialInstructions: data.specialInstructions
       };
 
       // Check if OTP verification is enabled

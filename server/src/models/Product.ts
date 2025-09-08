@@ -57,9 +57,8 @@ const productSchema = new Schema<IProduct>({
   }],
   stock: {
     type: Number,
-    required: [true, 'Please enter product stock'],
     min: [0, 'Stock cannot be negative'],
-    default: 1
+    default: 0
   },
   isAvailable: {
     type: Boolean,

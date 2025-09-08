@@ -12,6 +12,8 @@ class OrderController extends BaseController {
   create = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { items, paymentMethod, mobileNumber, specialInstructions, totalAmount } = req.body;
+      console.log('Order creation - mobileNumber:', mobileNumber);
+      console.log('Full request body:', req.body);
 
       // Verify products and calculate total
       let calculatedTotal = 0;
@@ -25,13 +27,7 @@ class OrderController extends BaseController {
           return;
         }
 
-        if (product.stock < item.quantity) {
-          res.status(400).json({
-            success: false,
-            message: `Insufficient stock for ${product.name}`
-          });
-          return;
-        }
+        // Stock check removed - stock is now optional
 
         calculatedTotal += product.price * item.quantity;
       }
@@ -46,19 +42,13 @@ class OrderController extends BaseController {
         totalAmount: totalAmount || calculatedTotal
       });
 
-      // Update product stock
-      for (const item of items) {
-        const product = await Product.findById(item.menuItem);
-        if (product) {
-          product.stock -= item.quantity;
-          await product.save();
-        }
-      }
+      // Stock update removed - stock is now optional
 
-      // Send order confirmation email
+      // Send order confirmation email and admin notification
       try {
         const user = await User.findById(req.user?.id);
         if (user) {
+          // Send confirmation to customer
           await sendEmail({
             email: user.email,
             subject: 'Order Confirmation - Real Taste',
@@ -74,14 +64,58 @@ class OrderController extends BaseController {
             `,
             message: `Order #${String(order._id).slice(-6)} confirmed. Total: ₹${order.totalAmount.toFixed(2)}`
           });
+          
+          // Send notification to admin
+          const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER;
+          if (adminEmail) {
+            const populatedOrder = await Order.findById(order._id).populate('items.menuItem');
+            if (populatedOrder) {
+              await sendEmail({
+                email: adminEmail,
+                subject: 'New Order Received - Real Taste',
+                html: `
+                  <h2>New Order Received!</h2>
+                  <h3>Customer Details:</h3>
+                  <p>Name: ${user.name}</p>
+                  <p>Email: ${user.email}</p>
+                  <p>Mobile: ${mobileNumber || 'Not provided'}</p>
+                  
+                  <h3>Order Details:</h3>
+                  <p>Order ID: #${String(order._id).slice(-6)}</p>
+                  <p>Total Amount: ₹${order.totalAmount}</p>
+                  <p>Payment Method: ${paymentMethod}</p>
+                  <p>Status: ${order.status}</p>
+                  <p>Order Time: ${new Date(order.createdAt).toLocaleString()}</p>
+                  
+                  ${specialInstructions ? `<p>Special Instructions: ${specialInstructions}</p>` : ''}
+                  
+                  <h3>Items Ordered:</h3>
+                  ${populatedOrder.items.map((item: any) => `
+                    <div style="margin-bottom: 10px; padding: 10px; border: 1px solid #ddd;">
+                      <p><strong>Item:</strong> ${item.menuItem?.name || 'Unknown Item'}</p>
+                      <p><strong>Quantity:</strong> ${item.quantity}</p>
+                      <p><strong>Price:</strong> ₹${item.price}</p>
+                      <p><strong>Total:</strong> ₹${(item.price * item.quantity).toFixed(2)}</p>
+                    </div>
+                  `).join('')}
+                `,
+                message: `New order #${String(order._id).slice(-6)} received from ${user.name}`
+              });
+            }
+          }
         }
       } catch (emailError) {
-        console.error('Failed to send order confirmation email:', emailError);
+        console.error('Failed to send order emails:', emailError);
       }
+
+      // Return populated order data
+      const populatedOrder = await Order.findById(order._id)
+        .populate('items.menuItem')
+        .populate('user', 'name email');
 
       res.status(201).json({
         success: true,
-        data: order
+        data: populatedOrder
       });
     } catch (error) {
       next(error);
@@ -110,9 +144,11 @@ class OrderController extends BaseController {
   getAll = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const orders = await Order.find()
-        .populate('items.menuItem')
+        .populate('items.menuItem', 'name image price')
         .populate('user', 'name email')
         .sort('-createdAt');
+
+      console.log('Sample order data:', orders[0]);
 
       res.status(200).json({
         success: true,
@@ -132,7 +168,8 @@ class OrderController extends BaseController {
         req.params.id,
         { status },
         { new: true, runValidators: true }
-      ).populate('user');
+      ).populate('user', 'name email')
+       .populate('items.menuItem', 'name image price');
 
       if (!order) {
         return res.status(404).json({
@@ -170,9 +207,14 @@ class OrderController extends BaseController {
         console.error('Failed to send status update email:', emailError);
       }
 
+      // Return fully populated order
+      const populatedOrder = await Order.findById(order._id)
+        .populate('user', 'name email')
+        .populate('items.menuItem', 'name image price');
+
       res.status(200).json({
         success: true,
-        data: order
+        data: populatedOrder
       });
     } catch (error) {
       next(error);

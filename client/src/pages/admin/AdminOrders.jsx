@@ -34,16 +34,7 @@ const AdminOrders = () => {
     }
   };
 
-  const handleAcceptReject = (order, action) => {
-    setConfirmAction({ order, action });
-  };
 
-  const confirmStatusUpdate = () => {
-    if (confirmAction) {
-      const newStatus = confirmAction.action === 'accept' ? 'Preparing' : 'Cancelled';
-      handleStatusUpdate(confirmAction.order._id, newStatus);
-    }
-  };
 
   const handleView = (order) => {
     setViewingOrder(order);
@@ -76,6 +67,7 @@ const AdminOrders = () => {
                   <tr>
                     <th className="table-header-spacing text-left text-xs font-medium text-amber-800 uppercase font-serif">Order ID</th>
                     <th className="table-header-spacing text-left text-xs font-medium text-amber-800 uppercase font-serif">Customer</th>
+                    <th className="table-header-spacing text-left text-xs font-medium text-amber-800 uppercase font-serif">Phone</th>
                     <th className="table-header-spacing text-left text-xs font-medium text-amber-800 uppercase font-serif">Date</th>
                     <th className="table-header-spacing text-left text-xs font-medium text-amber-800 uppercase font-serif">Total</th>
                     <th className="table-header-spacing text-left text-xs font-medium text-amber-800 uppercase font-serif">Status</th>
@@ -90,6 +82,9 @@ const AdminOrders = () => {
                       </td>
                       <td className="table-cell-spacing whitespace-nowrap text-sm text-amber-800 font-serif">
                         {order.user?.name || 'Unknown'}
+                      </td>
+                      <td className="table-cell-spacing whitespace-nowrap text-sm text-amber-800 font-serif">
+                        {order.mobileNumber || 'Not provided'}
                       </td>
                       <td className="table-cell-spacing whitespace-nowrap text-sm text-amber-800 font-serif">
                         {new Date(order.createdAt).toLocaleDateString()}
@@ -114,29 +109,12 @@ const AdminOrders = () => {
                           >
                             <Eye className="h-5 w-5" />
                           </button>
-                          {order.status === 'Pending' ? (
-                            <>
-                              <button 
-                                onClick={() => handleAcceptReject(order, 'accept')}
-                                className="bg-green-600 text-white px-3 py-1 rounded-full text-xs hover:bg-green-700 transition-all"
-                              >
-                                Accept
-                              </button>
-                              <button 
-                                onClick={() => handleAcceptReject(order, 'reject')}
-                                className="bg-red-600 text-white px-3 py-1 rounded-full text-xs hover:bg-red-700 transition-all"
-                              >
-                                Reject
-                              </button>
-                            </>
-                          ) : (
-                            <button 
-                              onClick={() => setEditingOrder(order)}
-                              className="text-amber-600 hover:text-amber-800 p-2 rounded-full hover:bg-amber-50 transition-all"
-                            >
-                              <Edit className="h-5 w-5" />
-                            </button>
-                          )}
+                          <button 
+                            onClick={() => setEditingOrder(order)}
+                            className="text-amber-600 hover:text-amber-800 p-2 rounded-full hover:bg-amber-50 transition-all"
+                          >
+                            <Edit className="h-5 w-5" />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -162,14 +140,7 @@ const AdminOrders = () => {
           />
         )}
 
-        {confirmAction && (
-          <ConfirmActionModal 
-            order={confirmAction.order}
-            action={confirmAction.action}
-            onConfirm={confirmStatusUpdate}
-            onClose={() => setConfirmAction(null)}
-          />
-        )}
+
         
         {actionLoading && <LoadingOverlay message="Updating order status..." />}
       </div>

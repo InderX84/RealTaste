@@ -69,7 +69,7 @@ const OrderDetailModal = ({ order, onClose }) => {
               {order.items?.map((item, index) => (
                 <div key={index} className="bg-amber-50 p-4 rounded-2xl flex justify-between items-center">
                   <div>
-                    <p className="font-serif font-semibold text-amber-900">{item.product?.name || 'Unknown Item'}</p>
+                    <p className="font-serif font-semibold text-amber-900">{item.menuItem?.name || 'Unknown Item'}</p>
                     <p className="text-amber-700 font-serif">Quantity: {item.quantity}</p>
                   </div>
                   <p className="font-bold text-amber-900 font-serif">₹{(item.price * item.quantity).toFixed(2)}</p>

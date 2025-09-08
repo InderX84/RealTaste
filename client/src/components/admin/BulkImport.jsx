@@ -11,11 +11,11 @@ const BulkImport = ({ type, onSuccess }) => {
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
-    if (selectedFile && selectedFile.type === 'text/csv') {
+    if (selectedFile && selectedFile.type === 'application/json') {
       setFile(selectedFile);
       setErrors([]);
     } else {
-      toast.error('Please select a valid CSV file');
+      toast.error('Please select a valid JSON file');
     }
   };
 
@@ -51,16 +51,46 @@ const BulkImport = ({ type, onSuccess }) => {
 
   const downloadTemplate = () => {
     const templates = {
-      products: 'name,description,price,category,stock,image,isAvailable\nBurger,Delicious beef burger,299,Fast Food,50,burger.jpg,true\nCoffee,Hot coffee,99,Beverages,100,coffee.jpg,true',
-      categories: 'name,description,isActive\nFast Food,Quick and tasty food items,true\nBeverages,Hot and cold drinks,true'
+      products: JSON.stringify([
+        {
+          "name": "Burger",
+          "description": "Delicious beef burger",
+          "price": 299,
+          "category": "category_id_here",
+          "stock": 50,
+          "image": "burger.jpg",
+          "isAvailable": true
+        },
+        {
+          "name": "Coffee",
+          "description": "Hot coffee",
+          "price": 99,
+          "category": "category_id_here",
+          "stock": 100,
+          "image": "coffee.jpg",
+          "isAvailable": true
+        }
+      ], null, 2),
+      categories: JSON.stringify([
+        {
+          "name": "Fast Food",
+          "description": "Quick and tasty food items",
+          "isActive": true
+        },
+        {
+          "name": "Beverages",
+          "description": "Hot and cold drinks",
+          "isActive": true
+        }
+      ], null, 2)
     };
 
     const content = templates[type];
-    const blob = new Blob([content], { type: 'text/csv' });
+    const blob = new Blob([content], { type: 'application/json' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${type}_template.csv`;
+    a.download = `${type}_template.json`;
     a.click();
     window.URL.revokeObjectURL(url);
   };
@@ -77,9 +107,9 @@ const BulkImport = ({ type, onSuccess }) => {
           <div className="flex items-start space-x-3">
             <FileText className="h-5 w-5 text-blue-600 mt-0.5" />
             <div>
-              <h4 className="font-semibold text-blue-900">CSV Format Required</h4>
+              <h4 className="font-semibold text-blue-900">JSON Format Required</h4>
               <p className="text-blue-700 text-sm mt-1">
-                Upload a CSV file with the required columns. Download the template below for reference.
+                Upload a JSON file with an array of objects. Download the template below for reference.
               </p>
             </div>
           </div>
@@ -97,11 +127,11 @@ const BulkImport = ({ type, onSuccess }) => {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Select CSV File
+            Select JSON File
           </label>
           <input
             type="file"
-            accept=".csv"
+            accept=".json"
             onChange={handleFileChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
           />

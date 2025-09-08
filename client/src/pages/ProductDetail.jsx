@@ -135,6 +135,16 @@ const ProductDetail = () => {
                   <span>Add to Cart</span>
                 </button>
               </div>
+              
+              <button
+                onClick={() => {
+                  handleAddToCart();
+                  window.location.href = '/checkout';
+                }}
+                className="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-serif font-bold hover:bg-green-700 transition-all flex items-center justify-center space-x-2 mt-4"
+              >
+                <span>🛒 Buy Now</span>
+              </button>
             </div>
           </div>
         </div>

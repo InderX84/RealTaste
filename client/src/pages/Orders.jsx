@@ -118,7 +118,7 @@ const Orders = () => {
                     <div className="flex flex-wrap gap-2">
                       {order.items.slice(0, 3).map((item, index) => (
                         <div key={index} className="flex items-center space-x-2 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
-                          <span className="text-amber-800 font-serif text-sm">{item.name}</span>
+                          <span className="text-amber-800 font-serif text-sm">{item.menuItem?.name || 'Unknown Item'}</span>
                           <span className="text-amber-600 font-serif text-xs">x{item.quantity}</span>
                         </div>
                       ))}
@@ -152,12 +152,13 @@ const Orders = () => {
                         {order.items.map((item, index) => (
                           <div key={index} className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 p-3 bg-white rounded-2xl border border-amber-200">
                             <img
-                              src={item.image || 'https://via.placeholder.com/60x60?text=No+Image'}
-                              alt={item.name}
+                              src={item.menuItem?.image || 'https://via.placeholder.com/60x60?text=No+Image'}
+                              alt={item.menuItem?.name || 'Unknown Item'}
                               className="w-12 h-12 object-cover rounded-lg self-center sm:self-auto"
+                              loading="lazy"
                             />
                             <div className="flex-1 text-center sm:text-left">
-                              <h6 className="font-serif font-semibold text-amber-900">{item.name}</h6>
+                              <h6 className="font-serif font-semibold text-amber-900">{item.menuItem?.name || 'Unknown Item'}</h6>
                               <p className="text-amber-700 font-serif text-sm">Quantity: {item.quantity}</p>
                             </div>
                             <div className="text-center sm:text-right">

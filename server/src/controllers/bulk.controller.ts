@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import multer from 'multer';
-import csv from 'csv-parser';
 import fs from 'fs';
 import path from 'path';
 import Product from '../models/Product';
@@ -19,47 +18,51 @@ export const bulkImportProducts = async (req: Request, res: Response) => {
       });
     }
 
-    const results: any[] = [];
-    const errors: string[] = [];
-
-    fs.createReadStream(req.file.path)
-      .pipe(csv())
-      .on('data', (data) => results.push(data))
-      .on('end', async () => {
-        let successCount = 0;
-        
-        for (const row of results) {
-          try {
-            const product = new Product({
-              name: row.name,
-              description: row.description,
-              price: parseFloat(row.price),
-              category: row.category,
-              stock: parseInt(row.stock) || 0,
-              image: row.image || '',
-              isAvailable: row.isAvailable !== 'false'
-            });
-            
-            await product.save();
-            successCount++;
-          } catch (error: any) {
-            errors.push(`Row ${results.indexOf(row) + 1}: ${error.message}`);
-          }
-        }
-
-        // Clean up uploaded file
-        fs.unlinkSync(req.file!.path);
-
-        res.json({
-          success: true,
-          message: `Imported ${successCount} products successfully`,
-          errors: errors.length > 0 ? errors : undefined
-        });
+    const fileContent = fs.readFileSync(req.file.path, 'utf8');
+    const products = JSON.parse(fileContent);
+    
+    if (!Array.isArray(products)) {
+      return res.status(400).json({
+        success: false,
+        message: 'JSON file must contain an array of products'
       });
-  } catch (error) {
+    }
+
+    const errors: string[] = [];
+    let successCount = 0;
+    
+    for (let i = 0; i < products.length; i++) {
+      try {
+        const productData = products[i];
+        const product = new Product({
+          name: productData.name,
+          description: productData.description,
+          price: parseFloat(productData.price),
+          category: productData.category,
+          stock: parseInt(productData.stock) || 0,
+          image: productData.image || '',
+          isAvailable: productData.isAvailable !== false
+        });
+        
+        await product.save();
+        successCount++;
+      } catch (error: any) {
+        errors.push(`Product ${i + 1}: ${error.message}`);
+      }
+    }
+
+    // Clean up uploaded file
+    fs.unlinkSync(req.file.path);
+
+    res.json({
+      success: true,
+      message: `Imported ${successCount} products successfully`,
+      errors: errors.length > 0 ? errors : undefined
+    });
+  } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: 'Failed to import products'
+      message: error.message.includes('JSON') ? 'Invalid JSON format' : 'Failed to import products'
     });
   }
 };
@@ -73,43 +76,47 @@ export const bulkImportCategories = async (req: Request, res: Response) => {
       });
     }
 
-    const results: any[] = [];
-    const errors: string[] = [];
-
-    fs.createReadStream(req.file.path)
-      .pipe(csv())
-      .on('data', (data) => results.push(data))
-      .on('end', async () => {
-        let successCount = 0;
-        
-        for (const row of results) {
-          try {
-            const category = new Category({
-              name: row.name,
-              description: row.description || '',
-              isActive: row.isActive !== 'false'
-            });
-            
-            await category.save();
-            successCount++;
-          } catch (error: any) {
-            errors.push(`Row ${results.indexOf(row) + 1}: ${error.message}`);
-          }
-        }
-
-        // Clean up uploaded file
-        fs.unlinkSync(req.file!.path);
-
-        res.json({
-          success: true,
-          message: `Imported ${successCount} categories successfully`,
-          errors: errors.length > 0 ? errors : undefined
-        });
+    const fileContent = fs.readFileSync(req.file.path, 'utf8');
+    const categories = JSON.parse(fileContent);
+    
+    if (!Array.isArray(categories)) {
+      return res.status(400).json({
+        success: false,
+        message: 'JSON file must contain an array of categories'
       });
-  } catch (error) {
+    }
+
+    const errors: string[] = [];
+    let successCount = 0;
+    
+    for (let i = 0; i < categories.length; i++) {
+      try {
+        const categoryData = categories[i];
+        const category = new Category({
+          name: categoryData.name,
+          description: categoryData.description || '',
+          isActive: categoryData.isActive !== false
+        });
+        
+        await category.save();
+        successCount++;
+      } catch (error: any) {
+        errors.push(`Category ${i + 1}: ${error.message}`);
+      }
+    }
+
+    // Clean up uploaded file
+    fs.unlinkSync(req.file.path);
+
+    res.json({
+      success: true,
+      message: `Imported ${successCount} categories successfully`,
+      errors: errors.length > 0 ? errors : undefined
+    });
+  } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: 'Failed to import categories'
+      message: error.message.includes('JSON') ? 'Invalid JSON format' : 'Failed to import categories'
     });
   }
 };
