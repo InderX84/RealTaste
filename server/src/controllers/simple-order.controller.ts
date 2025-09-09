@@ -185,7 +185,8 @@ class SimpleOrderController {
         req.params.id,
         { status },
         { new: true }
-      ).populate('user', 'name email');
+      ).populate('user', 'name email')
+       .populate('items.menuItem', 'name price image');
 
       if (!order) {
         return res.status(404).json({

@@ -161,12 +161,7 @@ const Menu = () => {
         </div>
 
         {/* Products Grid */}
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <Coffee className="h-16 w-16 text-amber-600 animate-bounce mb-4" />
-            <p className="text-amber-800 font-serif text-lg">Brewing something special...</p>
-          </div>
-        ) : filteredProducts.length === 0 ? (
+        {filteredProducts.length === 0 ? (
           <div className="text-center py-20 bg-white/60 backdrop-blur-sm rounded-3xl mx-4 card-spacing">
             <div className="text-6xl mb-6">😔</div>
             <h3 className="text-2xl font-serif font-bold text-amber-900 mb-4">Nothing matches your taste</h3>

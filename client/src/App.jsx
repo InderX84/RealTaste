@@ -72,20 +72,28 @@ const AppContent = () => {
   const { user } = useSelector(state => state.auth);
   const { loading } = useSelector(state => state.auth);
 
-  const [initialLoad, setInitialLoad] = useState(true);
+  const [initialLoad, setInitialLoad] = useState(() => {
+    return !sessionStorage.getItem('hasLoaded');
+  });
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const timer = setTimeout(() => {
-      if (token) {
-        dispatch(loadUser()).finally(() => setInitialLoad(false));
-      } else {
-        setInitialLoad(false);
-      }
-    }, 2000); // Show preloader for at least 2 seconds
+    if (initialLoad) {
+      const token = localStorage.getItem('token');
+      const timer = setTimeout(() => {
+        if (token) {
+          dispatch(loadUser()).finally(() => {
+            setInitialLoad(false);
+            sessionStorage.setItem('hasLoaded', 'true');
+          });
+        } else {
+          setInitialLoad(false);
+          sessionStorage.setItem('hasLoaded', 'true');
+        }
+      }, 2000);
 
-    return () => clearTimeout(timer);
-  }, [dispatch]);
+      return () => clearTimeout(timer);
+    }
+  }, [dispatch, initialLoad]);
 
   if (initialLoad) {
     return <Preloader />;
