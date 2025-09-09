@@ -7,6 +7,7 @@ import categoryRoutes from './category.routes';
 import adminSettingsRoutes from './admin-settings.routes';
 import settingsRoutes from './settings.routes';
 import otpRoutes from './otp.routes';
+import bulkRoutes from './bulk.routes';
 
 const router = express.Router();
 
@@ -18,5 +19,6 @@ router.use('/api/categories', categoryRoutes);
 router.use('/api/admin/settings', adminSettingsRoutes);
 router.use('/api/settings', settingsRoutes);
 router.use('/api/otp', otpRoutes);
+router.use('/api/bulk', bulkRoutes);
 
 export default router;

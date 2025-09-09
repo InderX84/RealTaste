@@ -87,7 +87,7 @@ const ProductDetail = () => {
     );
   }
 
-  const avgRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0;
+  const avgRating = product?.reviews?.length > 0 ? product.reviews.reduce((sum, r) => sum + r.rating, 0) / product.reviews.length : 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 py-8">
@@ -106,7 +106,7 @@ const ProductDetail = () => {
               <h1 className="text-3xl font-serif font-bold text-amber-900 mb-4">{product.name}</h1>
               <div className="flex items-center mb-4">
                 <div className="flex">{renderStars(Math.round(avgRating))}</div>
-                <span className="ml-2 text-amber-700 font-serif">({reviews.length} reviews)</span>
+                <span className="ml-2 text-amber-700 font-serif">({product?.reviews?.length || 0} reviews)</span>
               </div>
               <p className="text-amber-800 font-serif text-lg mb-6">{product.description}</p>
               <div className="text-3xl font-bold text-amber-900 mb-6">₹{product.price}</div>
@@ -157,9 +157,23 @@ const ProductDetail = () => {
 
 
 
-          <div className="text-center py-8">
-            <p className="text-amber-700 font-serif">Reviews feature coming soon!</p>
-          </div>
+          {product.reviews && product.reviews.length > 0 ? (
+            <div className="space-y-4">
+              {product.reviews.map((review, index) => (
+                <div key={index} className="bg-amber-50 p-4 rounded-lg border border-amber-200">
+                  <div className="flex items-center mb-2">
+                    <div className="flex">{renderStars(review.rating)}</div>
+                    <span className="ml-2 text-amber-700 font-serif text-sm">{new Date(review.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  <p className="text-amber-800 font-serif">{review.comment}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-amber-700 font-serif">No reviews yet. Be the first to review!</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

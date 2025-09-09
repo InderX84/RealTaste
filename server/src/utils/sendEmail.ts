@@ -6,25 +6,30 @@ const sendEmail = async (options: {
   message: string;
   html?: string;
 }) => {
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
 
-  const mailOptions = {
-    from: `Real Taste <${process.env.SMTP_USER}>`,
-    to: options.email,
-    subject: options.subject,
-    text: options.message,
-    html: options.html || options.message,
-  };
+    const mailOptions = {
+      from: `Real Taste Café <${process.env.SMTP_USER}>`,
+      to: options.email,
+      subject: options.subject,
+      text: options.message,
+      html: options.html || options.message,
+    };
 
-  await transporter.sendMail(mailOptions);
+    const result = await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully:', result.messageId);
+    return result;
+  } catch (error) {
+    console.error('Email sending failed:', error);
+    throw error;
+  }
 };
 
 export default sendEmail;

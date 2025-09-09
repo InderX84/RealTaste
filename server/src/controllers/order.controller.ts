@@ -12,8 +12,7 @@ class OrderController extends BaseController {
   create = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { items, paymentMethod, mobileNumber, specialInstructions, totalAmount } = req.body;
-      console.log('Order creation - mobileNumber:', mobileNumber);
-      console.log('Full request body:', req.body);
+
 
       // Verify products and calculate total
       let calculatedTotal = 0;
@@ -66,7 +65,7 @@ class OrderController extends BaseController {
           });
           
           // Send notification to admin
-          const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER;
+          const adminEmail = 'sparmindersingh873@gmail.com';
           if (adminEmail) {
             const populatedOrder = await Order.findById(order._id).populate('items.menuItem');
             if (populatedOrder) {
@@ -148,7 +147,7 @@ class OrderController extends BaseController {
         .populate('user', 'name email')
         .sort('-createdAt');
 
-      console.log('Sample order data:', orders[0]);
+
 
       res.status(200).json({
         success: true,

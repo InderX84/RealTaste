@@ -28,6 +28,7 @@ router.get('/:id', ProductController.getOne);
 router.get('/:productId/reviews', getProductReviews);
 
 // Protected routes
+router.post('/:id/review', protect, ProductController.addReview);
 router.post('/:productId/reviews', protect, addReview);
 
 // Admin routes

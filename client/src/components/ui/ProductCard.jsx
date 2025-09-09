@@ -31,12 +31,13 @@ const ProductCard = ({ product }) => {
   }
 
   return (
-    <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl overflow-hidden card-hover group border-2 border-amber-100 hover:border-amber-200 animate-fade-in">
+    <Link to={`/product/${product._id}`} className="block bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl overflow-hidden card-hover group border-2 border-amber-100 hover:border-amber-200 animate-fade-in">
       <div className="relative overflow-hidden">
         <img 
           src={allImages[currentImageIndex] || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop&crop=center'} 
           alt={product.name}
           className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
+          loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         
@@ -157,26 +158,20 @@ const ProductCard = ({ product }) => {
           </div>
         </div>
         
-        {/* Action Buttons */}
-        <div className="flex space-x-3">
-          <Link
-            to={`/product/${product._id}`}
-            className="flex-1 bg-amber-100 text-amber-800 py-3 px-4 rounded-2xl font-serif font-bold hover:bg-amber-200 transition-all duration-300 flex items-center justify-center space-x-2 border-2 border-amber-200 hover:border-amber-300"
-          >
-            <Eye className="h-4 w-4" />
-            <span>Details</span>
-          </Link>
-          <button
-            onClick={handleAddToCart}
-            disabled={!product.isAvailable}
-            className="flex-2 bg-gradient-to-r from-amber-700 to-orange-700 text-yellow-100 py-3 px-4 rounded-2xl font-serif font-bold hover:from-amber-800 hover:to-orange-800 transition-all duration-300 transform hover:scale-105 shadow-lg disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
-          >
-            <Plus className="h-4 w-4" />
-            <span>{product.isAvailable ? 'Add to Cart' : 'Unavailable'}</span>
-          </button>
-        </div>
+        {/* Action Button */}
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            handleAddToCart();
+          }}
+          disabled={!product.isAvailable}
+          className="w-full bg-gradient-to-r from-amber-700 to-orange-700 text-yellow-100 py-3 px-4 rounded-2xl font-serif font-bold hover:from-amber-800 hover:to-orange-800 transition-all duration-300 transform hover:scale-105 shadow-lg disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
+        >
+          <Plus className="h-4 w-4" />
+          <span>{product.isAvailable ? 'Add to Cart' : 'Unavailable'}</span>
+        </button>
       </div>
-    </div>
+    </Link>
   );
 };
 

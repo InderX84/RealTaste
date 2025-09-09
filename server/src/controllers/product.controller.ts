@@ -77,18 +77,18 @@ class ProductController extends BaseController {
       const review = {
         rating: Number(rating),
         comment,
-        user: req.user?.id ? require('mongoose').Types.ObjectId(req.user.id) : undefined,
+        user: new (require('mongoose')).Types.ObjectId(req.user?.id),
         createdAt: new Date()
       };
 
       product.reviews = product.reviews || [];
       product.reviews.push(review);
-      if (typeof (product as any).calculateAverageRating === 'function') {
-        await (product as any).calculateAverageRating();
-      }
+      product.numOfReviews = product.reviews.length;
+      await product.save();
 
       res.status(200).json({
         success: true,
+        message: 'Review added successfully',
         data: product
       });
     } catch (error) {

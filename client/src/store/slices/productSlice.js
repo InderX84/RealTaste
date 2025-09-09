@@ -12,7 +12,7 @@ const API_URL = getApiUrl();
 
 export const fetchProducts = createAsyncThunk('products/fetchProducts', async (_, { rejectWithValue }) => {
   try {
-    const { data } = await axios.get(API_URL);
+    const { data } = await axios.get(`${API_URL}?limit=1000`);
     return data;
   } catch (error) {
     return rejectWithValue(error.response.data.message);

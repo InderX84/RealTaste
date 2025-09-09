@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { ShoppingBag, Calendar, DollarSign, ChevronDown, ChevronUp, Eye } from 'lucide-react';
+import { ShoppingBag, Calendar, DollarSign, ChevronDown, ChevronUp, Eye, Star } from 'lucide-react';
 import { fetchUserOrders } from '../store/slices/orderSlice';
+import { useToast } from '../contexts/ToastContext';
+import api from '../utils/api';
 
 const Orders = () => {
   const dispatch = useDispatch();
+  const toast = useToast();
   const { user, isAuthenticated } = useSelector(state => state.auth);
   const { userOrders: orders = [], loading } = useSelector(state => state.orders);
   const [expandedOrders, setExpandedOrders] = useState(new Set());
+  const [reviewingItem, setReviewingItem] = useState(null);
+  const [reviewData, setReviewData] = useState({ rating: 5, comment: '' });
 
   const toggleOrderExpansion = (orderId) => {
     const newExpanded = new Set(expandedOrders);
@@ -17,6 +22,18 @@ const Orders = () => {
       newExpanded.add(orderId);
     }
     setExpandedOrders(newExpanded);
+  };
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await api.post(`/api/products/${reviewingItem.menuItem._id}/review`, reviewData);
+      toast.success('Review submitted successfully!');
+      setReviewingItem(null);
+      setReviewData({ rating: 5, comment: '' });
+    } catch (error) {
+      toast.error('Failed to submit review');
+    }
   };
 
   useEffect(() => {
@@ -164,6 +181,15 @@ const Orders = () => {
                             <div className="text-center sm:text-right">
                               <p className="font-serif font-bold text-amber-900">₹{item.price}</p>
                               <p className="text-amber-700 font-serif text-sm">Total: ₹{(item.price * item.quantity).toFixed(2)}</p>
+                              {order.status === 'Delivered' && (
+                                <button
+                                  onClick={() => setReviewingItem(item)}
+                                  className="mt-2 px-3 py-1 bg-amber-600 text-white text-xs rounded-full hover:bg-amber-700 transition-colors"
+                                >
+                                  <Star className="h-3 w-3 inline mr-1" />
+                                  Review
+                                </button>
+                              )}
                             </div>
                           </div>
                         ))}
@@ -193,6 +219,60 @@ const Orders = () => {
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* Review Modal */}
+        {reviewingItem && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-3xl p-6 max-w-md w-full">
+              <h3 className="text-xl font-serif font-bold text-amber-900 mb-4">
+                Review {reviewingItem.menuItem?.name}
+              </h3>
+              <form onSubmit={handleReviewSubmit}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-amber-800 mb-2">Rating</label>
+                  <div className="flex space-x-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setReviewData(prev => ({ ...prev, rating: star }))}
+                        className="text-2xl focus:outline-none"
+                      >
+                        <Star className={`h-6 w-6 ${star <= reviewData.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-amber-800 mb-2">Comment</label>
+                  <textarea
+                    value={reviewData.comment}
+                    onChange={(e) => setReviewData(prev => ({ ...prev, comment: e.target.value }))}
+                    className="w-full px-3 py-2 border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    rows={3}
+                    placeholder="Share your experience..."
+                    required
+                  />
+                </div>
+                <div className="flex space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => setReviewingItem(null)}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700"
+                  >
+                    Submit Review
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         )}
       </div>

@@ -5,7 +5,7 @@ const API_URL = '/api';
 
 export const fetchAllProducts = createAsyncThunk('admin/fetchAllProducts', async (_, { rejectWithValue }) => {
   try {
-    const { data } = await api.get(`${API_URL}/products`);
+    const { data } = await api.get(`${API_URL}/products?limit=1000`);
     return data;
   } catch (error) {
     return rejectWithValue(error.response?.data?.message || 'Failed to fetch products');
